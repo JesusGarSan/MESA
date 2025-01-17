@@ -13,16 +13,25 @@ if __name__ == "__main__":
 
     """ Set the parameters """
     sr = 100;       # Hz. Sampling rate
-    t = 1;          # s. Duration of the signal
-    n_bins = 200;   # Number of bins to use for the DFT calculation
+    t = 10;          # s. Duration of the signal
+    n_bins = 1000;   # Number of bins to use for the DFT calculation
     N = 10000;      # Number of different frequencies composing the signal
 
     
     """ Generate the signal """
     freq = generate_frequencies(N, sr=sr);
-    A = generate_amplitudes(N);
+    A = generate_amplitudes(N, sigma= 10);
     x, y = generate_signal(freq, A, t=t, sr=sr);
 
+
+    """ Add high frequency noise """
+    AN = generate_amplitudes(10);
+    f0 = np.random.normal(1000, 0.1, 10)
+    _, noise = generate_signal(f0, AN, t=t, sr=sr)
+
+    print(noise.shape)
+
+    y += noise;
 
     # Calculate the FFTs
     fft, fft_freq = fft_bin(y, n_bins=n_bins, sr=sr)

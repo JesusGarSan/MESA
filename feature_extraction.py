@@ -10,3 +10,4 @@ def fft_bin(signal:float, n_bins:int, sr:float):
     freqs = np.fft.fftfreq(n_bins, d=1/sr)
     
     return fft, freqs
+

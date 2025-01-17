@@ -21,6 +21,6 @@ def Parseval(signal, fft, verbose = True):
         Ratio:                   {E_t/E_f}
         """)   
 
-    assert np.isclose(E_t, E_f), "The energy is not conserved"
+    assert np.isclose(E_t, E_f), f"The energy is not conserved. Ratio: {E_t/E_f}"
 
     return
