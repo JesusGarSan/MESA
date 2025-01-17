@@ -2,38 +2,42 @@ import numpy as np
 import scipy
 import matplotlib.pyplot as plt
 
+from simule_data import *
+from feature_extraction import *
 
-def simule_data(f0 = 2, n_f = 10, df = 0.1, sr = 100, t = 1, verbose = False):
-    """
-        f0  = 1.   #Hz. frequency of the signal
-        n_f = 10   # Number of Complementary frequencies
-        df  = 0.1  #Hz. Complementary frequencies step
-        sr  = 100. #Hz. sampling rate
-        t   = 15.  #s. Signal duration 
-    """
-
-    if verbose:
-        print(f"""Maximum observable frequency (Nyquist): {sr/2}Hz""")
-
-    x = np.linspace(0, t, int(t*sr))
-    y = 0
-    for f in np.arange(1, n_f)*df:
-        y += np.sin(x * 2*np.pi*(f0 + f))
-
-    return x, y 
 
 
 if __name__ == "__main__":
     print("Running main ...")
 
-    x, y = simule_data(f0 = 1,
-        verbose = True)
+    N = 1000;
+    freq = generate_frequencies(N);
+    A = generate_amplitudes(N);
+    x, y = generate_signal(freq, A, t=100)
 
     fig, ax = plt.subplots()
+    plt.title("Raw signal")
     plt.plot(x,y)
     plt.xlabel("Time")
     plt.ylabel("Amplitude")
     plt.grid()
     plt.show()
+
+    fft, fft_freq = fft_bin(y, 100, 100)
+    # Keep only the positive values
+    fft_freq = fft_freq[0:len(fft_freq)//2]
+    fft = fft[0:len(fft)//2]
+    
+    fig, ax = plt.subplots(2, 1, sharex=True)
+    fig.suptitle("Fast Fourier Transform")
+    ax[0].set_title("Real part")
+    ax[0].bar(fft_freq, np.abs(np.real(fft)))
+    ax[0].grid()
+    ax[1].set_title("Imaginary part")
+    ax[1].bar(fft_freq, np.abs(np.imag(fft)))
+    ax[1].grid()
+    ax[1].set_xlabel("Frequencies (Hz)")
+    plt.show()
+
 
 
