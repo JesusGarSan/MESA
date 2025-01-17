@@ -1,6 +1,7 @@
 import numpy as np
 from feature_extraction import *
 import plot
+from tests import *
 
 class Processor:
     def __init__(self, signal, sample_rate, x=None):
@@ -17,18 +18,61 @@ class Processor:
 
     def check(self):
         print(f"""
-        Nº samples:     {self.n_samples}
-        sample rate:    {self.sr} Hz
         signal duration:{self.duration} s
+        sample rate:    {self.sr} Hz
+        Nº samples:     {self.n_samples}
         FFT bins:       {self.n_bins} 
         """)
 
+    def Parseval(self, verbose=True):
+        Parseval(self.signal, self.fft, verbose)
+
+
     """ Feature extraction functions """
-    def fft(self, n_bins):
+    def fft_bin(self, n_bins):
         self.n_bins = n_bins;
         self.fft, self.freqs = fft_bin(self.signal, n_bins, self.sr)
 
+    def set_windows(self, window, shift = None):
+        """
+        window: Window length in seconds
+        shift:  Window shift in seconds
+        """
+        if shift == None: shift = window
+        overlap = window - shift
 
+        window_samples = int(window * self.sr)
+        shift_samples = shift*self.sr
+        overlap_samples = overlap * self.sr
+
+        N_windows = (self.n_samples - overlap_samples) // (window_samples - overlap_samples)
+
+        self.window_start_ids = np.arange(0, self.n_samples - window_samples + 1, shift_samples,
+                                          dtype=int);
+
+        self.window = window;
+        self.shift = shift;
+        self.overlap = overlap;
+        self.N_windows = int(N_windows);
+        self.window_samples = window_samples;
+        self.overlap_samples = overlap_samples;
+        self.shift_samples = shift_samples;
+    
+    def fft_bin_window(self, n_bins):
+        self.n_bins = n_bins;
+        
+        fft_windows = np.zeros((self.N_windows, n_bins))
+        print(fft_windows.shape)
+        for i in range(self.N_windows):
+            start_id = self.window_start_ids[i]
+            end_id = start_id + self.window_samples
+            signal = self.signal[start_id:end_id]
+            fft, freqs =  fft_bin(signal, n_bins, self.sr)
+            fft_windows[i] = fft
+
+        self.fft_windows = fft_windows;
+        self.freqs_windows = freqs;
+        
     """ Plotting functions """
     def plot_signal(self):
         return plot.signal(self.x, self.signal)

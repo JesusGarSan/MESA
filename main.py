@@ -44,14 +44,22 @@ if __name__ == "__main__":
     plt.show(block=False)
 
     # Calculate the FFTs
-    signal.fft(n_bins)
+    signal.fft_bin(n_bins)
     # Plot the FFTs
     signal.plot_fft()
     plt.show(block=False)
 
-    # # Run checks
-    # Parseval(y, fft)
+    # Run checks
+    signal.Parseval()
     
+
+    input()
+    
+    """ Creating data matrix """
+    signal.set_windows(1, 0.5);
+    signal.fft_bin_window(n_bins)
+    print(signal.fft_windows)
+    print(signal.fft_windows.shape)
     input()
 
 
