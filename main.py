@@ -1,11 +1,11 @@
 import numpy as np
-import scipy
 import matplotlib.pyplot as plt
 
 from simule_data import *
 from feature_extraction import *
 import plot
 from tests import Parseval
+from Processor import Processor
 
 
 if __name__ == "__main__":
@@ -13,8 +13,8 @@ if __name__ == "__main__":
 
     """ Set the parameters """
     sr = 100;       # Hz. Sampling rate
-    t = 10;          # s. Duration of the signal
-    n_bins = 1000;   # Number of bins to use for the DFT calculation
+    t = 10;         # s. Duration of the signal
+    n_bins = 1000;  # Number of bins to use for the DFT calculation
     N = 10000;      # Number of different frequencies composing the signal
 
     
@@ -33,23 +33,25 @@ if __name__ == "__main__":
 
     y += noise;
 
-    # Calculate the FFTs
-    fft, fft_freq = fft_bin(y, n_bins=n_bins, sr=sr)
+    # -----------------------------
+    signal = Processor(y, sr)
+    signal.check()
+
+
 
     # Plot the signal
-    plot.signal(x,y)
+    signal.plot_signal()
     plt.show(block=False)
 
+    # Calculate the FFTs
+    signal.fft(n_bins)
     # Plot the FFTs
-    plot.fft(fft_freq, fft)
+    signal.plot_fft()
     plt.show(block=False)
 
-    # Run checks
-    Parseval(y, fft)
+    # # Run checks
+    # Parseval(y, fft)
     
-
-
-
     input()
 
 

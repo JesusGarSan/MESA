@@ -11,3 +11,16 @@ def fft_bin(signal:float, n_bins:int, sr:float):
     
     return fft, freqs
 
+
+def set_windows(window, shift, t, sr):
+    """
+    window: Window length in seconds
+    shift:  Window shift in seconds
+    t:      Signal duration in secods
+    sr:     Sampling rate of the signal in Hz
+    """
+    N = sr*t # Total samples in the signal
+    window_n = window*sr
+    shift_n = shift*sr
+
+    return
