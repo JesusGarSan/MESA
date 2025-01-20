@@ -11,6 +11,11 @@ class Processor:
         self.duration = len(signal)/sample_rate
         self.n_samples = len(signal)
         self.n_bins = None
+        self.fft_resolution = None
+
+        self.window = None
+        self.shift = None
+        self.overlap = None
 
         if x == None:
             self.x = np.linspace(0, self.duration, self.n_samples)
@@ -21,7 +26,18 @@ class Processor:
         signal duration:{self.duration} s
         sample rate:    {self.sr} Hz
         Nº samples:     {self.n_samples}
+        """)
+        
+    def check_fft(self):
+        print(f"""
+        signal duration:{self.duration} s
+        sample rate:    {self.sr} Hz
+        Nº samples:     {self.n_samples}
         FFT bins:       {self.n_bins} 
+        FFT resolution: {self.fft_resolution} Hz
+        window length:  {self.window} s
+        window overlap: {self.overlap} s 
+        window shift:   {self.shift} s
         """)
 
     def Parseval(self, verbose=True):
@@ -31,6 +47,10 @@ class Processor:
     """ Feature extraction functions """
     def fft_bin(self, n_bins):
         self.n_bins = n_bins;
+        self.fft_resolution = self.sr/n_bins;
+        self.window = self.duration;
+        self.shift = None
+        self.overlap = None
         self.fft, self.freqs = fft_bin(self.signal, n_bins, self.sr)
 
     def set_windows(self, window, shift = None):
@@ -60,6 +80,7 @@ class Processor:
     
     def fft_bin_window(self, n_bins):
         self.n_bins = n_bins;
+        self.fft_resolution = self.sr/n_bins;
         fft_windows = np.zeros((self.N_windows, n_bins), dtype=np.complex_)
         
         for i in range(self.N_windows):

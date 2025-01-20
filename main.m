@@ -21,7 +21,7 @@ end
 
 
 %% Preprocessing
-prep = 1; % 0 = No Preprocessing, 1 = Mean Centering ; 2 = autoscaling
+prep = 0; % 0 = No Preprocessing, 1 = Mean Centering ; 2 = autoscaling
 
 prep_methods = ["No preprocessing", "Mean Centering", "Autoscaling"];
 disp("Preprocesing method: " + prep_methods(prep+1))
@@ -30,11 +30,13 @@ clear prep_methods
 
 %% Choosing the number of PCs
 % VarX + ckf
+disp("Displaying var+ckf plot")
 pcs = 0:20;
 x_var = varPca(Xcs, 'Pcs', pcs, 'Preprocessing', 0, 'PlotCkf', true); 
 
 %% Create PCA model
 pcs = 1:2;
+disp("Creating PCA model with "+ string(pcs(end))+ "PCs")
 
 model.lvs = pcs;
 model.var = trace(Xcs'*Xcs);
@@ -45,11 +47,14 @@ d = diag(T'*T);
 var_PC1 = 100*d(1)/model.var;
 
 %% Plot scores
-scores(model, 'ObsLabel', (1:size(data, 1))', 'ObsClass', 1:size(data, 1));
+disp("Displaying scores plot")
+scores(model, 'ObsLabel', 1:size(data, 1), 'ObsClass', 1:size(data, 1));
 title('Time')
 
 %% Plot loadings
+disp("Displaying loadings plot")
 loadings(model, 'VarsLabel', var_l, 'VarsClass', var_class, 'Color', 'okabeIto');
 legend()
 
-hold on;
+%%
+disp("MEDA analysis completed.")

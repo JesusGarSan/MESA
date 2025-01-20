@@ -15,7 +15,7 @@ if __name__ == "__main__":
     """ Set the parameters """
     sr = 100;       # Hz. Sampling rate
     t = 10;         # s. Duration of the signal
-    n_bins = 1000;  # Number of bins to use for the DFT calculation
+    n_bins = 100;  # Number of bins to use for the DFT calculation
     N = 10000;      # Number of different frequencies composing the signal
 
     
@@ -45,8 +45,6 @@ if __name__ == "__main__":
     # Plot the FFTs
     signal.plot_fft()
     plt.show(block=False)
-
-    # input()
 
     """ Run checks """
     signal.Parseval()

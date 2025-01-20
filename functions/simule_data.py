@@ -18,7 +18,8 @@ def generate_signal(freq:float, A:float, sr = 100.0, t = 1.0, verbose = False):
     for f, a in zip(freq, A):
         y += (a*np.sin(x * 2*np.pi*f 
             + np.random.rand()*np.pi*2) # Apply random phase
-            + ((np.random.rand()-0.5)*a)) # Apply random mean
+            # + ((np.random.rand()-0.5)*a)) # Apply random mean
+            )   
 
     return x, y 
 
