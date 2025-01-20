@@ -1,10 +1,11 @@
+# %%
 import numpy as np
 import matplotlib.pyplot as plt
 
-from simule_data import *
-from feature_extraction import *
-import plot
-from tests import Parseval
+from functions.simule_data import *
+from functions.feature_extraction import *
+import functions.plot
+from functions.tests import Parseval
 from Processor import Processor
 
 
@@ -28,17 +29,13 @@ if __name__ == "__main__":
     AN = generate_amplitudes(10);
     f0 = np.random.normal(1000, 0.1, 10)
     _, noise = generate_signal(f0, AN, t=t, sr=sr)
-
-    print(noise.shape)
-
     y += noise;
 
-    # -----------------------------
+    """ Create signal object """
     signal = Processor(y, sr)
     signal.check()
 
-
-
+    """ Plot the signal and its FFT """
     # Plot the signal
     signal.plot_signal()
     plt.show(block=False)
@@ -49,17 +46,20 @@ if __name__ == "__main__":
     signal.plot_fft()
     plt.show(block=False)
 
-    # Run checks
+    # input()
+
+    """ Run checks """
     signal.Parseval()
     
-
-    input()
-    
-    """ Creating data matrix """
+    """ Apply windowing and calculate FFT"""
     signal.set_windows(1, 0.5);
     signal.fft_bin_window(n_bins)
-    print(signal.fft_windows)
-    print(signal.fft_windows.shape)
-    input()
+
+    # %%
+    """ Create data matrix """
+    ffts = signal.fft_windows[:, 0:n_bins//2]
+    fft_freq = signal.freqs_windows[0:n_bins//2]
+    fft_freq_str = [f"{round(freq, 2)} Hz" for freq in fft_freq]
+    # save(np.abs(ffts), column_names=fft_freq, filepath="./data/")
 
 

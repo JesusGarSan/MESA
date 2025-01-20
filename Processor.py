@@ -1,7 +1,7 @@
 import numpy as np
-from feature_extraction import *
-import plot
-from tests import *
+from functions.feature_extraction import *
+import functions.plot as plot
+from functions.tests import *
 
 class Processor:
     def __init__(self, signal, sample_rate, x=None):
@@ -60,9 +60,8 @@ class Processor:
     
     def fft_bin_window(self, n_bins):
         self.n_bins = n_bins;
+        fft_windows = np.zeros((self.N_windows, n_bins), dtype=np.complex_)
         
-        fft_windows = np.zeros((self.N_windows, n_bins))
-        print(fft_windows.shape)
         for i in range(self.N_windows):
             start_id = self.window_start_ids[i]
             end_id = start_id + self.window_samples
