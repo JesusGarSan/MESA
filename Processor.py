@@ -38,6 +38,7 @@ class Processor:
         window length:  {self.window} s
         window overlap: {self.overlap} s 
         window shift:   {self.shift} s
+        Nº of windows:  {self.N_windows}
         """)
 
     def Parseval(self, verbose=True):

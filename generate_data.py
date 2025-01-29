@@ -1,5 +1,6 @@
 from functions.simule_data import *
 from functions.feature_extraction import *
+from functions.tests import *
 from Processor import Processor
 
 """ Set the parameters """
@@ -9,7 +10,7 @@ N = 1000;      # Number of different frequencies composing the signal
 
 window = 1.0     # s. Length of the windows in seconds
 shift  = window  # s. Length of the window shift in seconds
-n_bins = window*sr*10;  # Number of bins to use for the DFT calculation
+n_bins = int(window*sr/2);  # Number of bins to use for the DFT calculation
 
 f = [1.70, 11.111] # Hz. Main frequencies of the simulated signals
 sigma_f = .5 # standard deviation around the frequencies chosen for the signal generation
@@ -19,6 +20,8 @@ n_sensors = 5; # Number of sensors in the simulation
 sensors = []
 
 print(f"FFT resolution: {sr/n_bins}Hz")
+print(f"True FFT resolution: {sr/(window*sr)}Hz")
+bins_check(sr, window, n_bins)
 
 plot = True
 if plot: 

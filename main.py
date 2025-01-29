@@ -15,7 +15,7 @@ if __name__ == "__main__":
     """ Set the parameters """
     sr = 100;       # Hz. Sampling rate
     t = 10;         # s. Duration of the signal
-    n_bins = 100;  # Number of bins to use for the DFT calculation
+    n_bins = 1000;  # Number of bins to use for the DFT calculation
     N = 10000;      # Number of different frequencies composing the signal
 
     
@@ -53,6 +53,7 @@ if __name__ == "__main__":
     signal.set_windows(1, 0.5);
     signal.fft_bin_window(n_bins)
 
+    input()
     # %%
     """ Create data matrix """
     ffts = signal.fft_windows[:, 0:n_bins//2]
