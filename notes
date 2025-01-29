@@ -3,3 +3,16 @@ multiply in he time domain by sine for the convolution.
 THis lets you move your lowfrequencies to high ones.
 
 Sinthetic experiemtn where I can see eveyting .
+_______________________________
+
+Lo que estoy intentando es guardar los datos "reales". usados para la generación y comparar.
+Conozco las frecuencias utilizadas.
+Conozco las Amplitudes de las señales con esas frecuencias
+Tengo que encontrar los valores del seno generador en el instante de cada ventana (teniendo en cuenta el desfase, que conozco). -> determino la "convolución"
+Promedio los valores de amplitud en esa ventana
+
+__________________________________
+
+I need to group the loadings based on the resolution so that they are actually comparable
+
+Tomo el salto de las frecuencias dadas por al reolución experimental. Para cada salto busco el índice de frecuencias generadas con ese valor, y hago la media de ahí a las anteriores

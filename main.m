@@ -3,7 +3,7 @@ clc
 close all
 
 %% Load the data files together
-files = dir('data/*.mat');
+files = dir('simulation_data/*.mat');
 
 data = [];
 var_class = [];
@@ -53,7 +53,8 @@ title('Time')
 
 %% Plot loadings
 disp("Displaying loadings plot")
-loadings(model, 'VarsLabel', var_l, 'VarsClass', var_class, 'Color', 'okabeIto');
+loadings(model, 'VarsLabel', var_l, 'VarsClass', var_class, 'Color', 'okabeIto', ...
+    'BlurIndex', 2);
 legend()
 
 %%
