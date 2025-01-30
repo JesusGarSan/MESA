@@ -2,8 +2,16 @@
 clc 
 close all
 
+%% Compare true and experimental data
+load('C:\Users\Jesús\Documents\GitHub\DFT_MEDA\data\sensor_1.mat')
+exp_data = matrix;
+load('C:\Users\Jesús\Documents\GitHub\DFT_MEDA\simulation_data\sensor_1.mat')
+true_data = matrix;
+
+
 %% Load the data files together
 files = dir('simulation_data/*.mat');
+files = dir('data/*.mat');
 
 data = [];
 var_class = [];
@@ -54,7 +62,7 @@ title('Time')
 %% Plot loadings
 disp("Displaying loadings plot")
 loadings(model, 'VarsLabel', var_l, 'VarsClass', var_class, 'Color', 'okabeIto', ...
-    'BlurIndex', 2);
+    'BlurIndex', .01);
 legend()
 
 %%

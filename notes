@@ -12,7 +12,3 @@ Tengo que encontrar los valores del seno generador en el instante de cada ventan
 Promedio los valores de amplitud en esa ventana
 
 __________________________________
-
-I need to group the loadings based on the resolution so that they are actually comparable
-
-Tomo el salto de las frecuencias dadas por al reolución experimental. Para cada salto busco el índice de frecuencias generadas con ese valor, y hago la media de ahí a las anteriores

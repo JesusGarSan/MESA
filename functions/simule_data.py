@@ -27,6 +27,7 @@ def generate_frequencies(N, sigma = 0.1, mode = 'random', f0 = None, sr:float = 
         if f0 is None:
             f0 = np.random.rand(N) * f_Ny # Central frequency
         freq = np.random.normal(loc = f0, scale = sigma, size = N) # loc: Mean, scale = standard deviation
+        freq = np.abs(freq) # Discard negative frequencies as they don't make physical sense
     return freq
 
     

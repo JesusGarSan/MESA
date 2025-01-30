@@ -8,11 +8,8 @@ import scipy
 
 def fft_bin(signal:float, n_bins:int, sr:float):
     fft = np.fft.fft(signal, n=n_bins)
-    freqs = np.fft.fftfreq(n_bins, d=1/sr)
-    
+    freqs = np.fft.fftfreq(n_bins, d=1/sr)    
     return fft, freqs
-
-
 
 
 def save(matrix, column_names = None, filepath="./output.mat"):
