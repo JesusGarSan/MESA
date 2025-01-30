@@ -16,13 +16,8 @@ def generate_signal(freq:float, A:float, sr = 100.0, t = 1.0, phi:float=0, verbo
         print(f"""Maximum observable frequency (Nyquist): {sr/2}Hz""")
 
     x = np.linspace(0, t, int(t*sr))
-    y = 0
-
-    for f, a, p in zip(freq, A, phi):
-        y += (a*np.sin(x * 2*np.pi*f 
-            + p) # Apply phase
-            # + ((np.random.rand()-0.5)*a)) # Apply random mean
-            )   
+    y = A*np.sin(np.outer(x, 2*np.pi*freq)+phi)
+    y = np.sum(y, axis = 1)
 
     return x, y 
 
