@@ -1,3 +1,7 @@
-__pycache__
+**/__pycache__
 .vscode
-*.asv
+
+/data/
+/simulation_data/
+
+*.asvgi

@@ -8,9 +8,9 @@ sr = 100;       # Hz. Sampling rate
 t = 60;         # s. Duration of the signal
 N = 100;      # Number of different frequencies composing the signal
 
-window = 1.0     # s. Length of the windows in seconds
+window = 5.0     # s. Length of the windows in seconds
 shift  = window  # s. Length of the window shift in seconds
-n_bins = int(window*sr/0.8);  # Number of bins to use for the DFT calculation
+n_bins = int(window*sr/1);  # Number of bins to use for the DFT calculation
 
 f = [1.3333, 11.11111] # Hz. Main frequencies of the simulated signals
 sigma_f = 0.01 # standard deviation around the frequencies chosen for the signal generation
