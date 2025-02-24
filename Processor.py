@@ -1,7 +1,7 @@
 import numpy as np
-from functions.feature_extraction import *
-import functions.plot as plot
-from functions.tests import *
+from feature_extraction.functions import *
+import plot as plot
+from tests import *
 
 class Processor:
     def __init__(self, signal, sample_rate, x=None):

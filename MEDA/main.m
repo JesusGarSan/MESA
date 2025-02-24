@@ -3,8 +3,8 @@ clc
 close all
 
 %% Load the data files together
-files = dir('simulation_data/*.mat');
-files = dir('data/*.mat');
+files = dir('data/simulation_data/empirical_data/*.mat');
+files = dir('data/simulation_data/theoretical_data/*.mat');
 
 data = [];
 var_class = [];

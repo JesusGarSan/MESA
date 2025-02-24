@@ -2,10 +2,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from functions.simule_data import *
-from functions.feature_extraction import *
-import functions.plot
-from functions.tests import Parseval
+from simulation.functions import *
+from feature_extraction.functions import *
+import plot
+from tests import Parseval
 from Processor import Processor
 
 

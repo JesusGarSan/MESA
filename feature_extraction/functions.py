@@ -13,7 +13,6 @@ def fft_bin(signal:float, n_bins:int, sr:float):
 
 
 def save(matrix, column_names = None, filepath="./output.mat"):
-    
     dict = {'matrix': matrix}
 
     if column_names is not None:

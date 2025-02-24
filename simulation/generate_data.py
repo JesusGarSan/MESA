@@ -1,6 +1,10 @@
-from functions.simule_data import *
-from functions.feature_extraction import *
-from functions.tests import *
+import os
+import sys
+sys.path.insert(1, os.getcwd())
+
+from simulation.functions import *
+from feature_extraction.functions import *
+from tests import *
 from Processor import Processor
 
 """ Set the parameters """
@@ -75,7 +79,7 @@ for i in range(n_sensors):
     fft_freq_str = [f"{round(freq, 2)} Hz" for freq in fft_freq]
 
     """ Save the data matrix """
-    filepath = f"./data/sensor_{i+1}.mat"
+    filepath = f"./data/simulation_data/empirical_data/sensor_{i+1}.mat"
     save(np.abs(ffts), column_names=fft_freq_str, filepath=filepath)
     print(f"Sensor {i+1} data saved at {filepath}")
 
@@ -104,7 +108,7 @@ for i in range(n_sensors):
     """ Save the true data matrix """
     fft_freq += fft_res # Correction for the true data labels
     fft_freq_str = [f"{round(freq, 2)} Hz" for freq in fft_freq]
-    filepath = f"./simulation_data/sensor_{i+1}.mat"
+    filepath = f"./data/simulation_data/theoretical_data/sensor_{i+1}.mat"
     save(data, column_names=fft_freq_str, filepath=filepath)
     print(f"Sensor {i+1} true data saved at {filepath}")
 
@@ -114,5 +118,5 @@ if plot:
         # Set the same Y-axis for all sensors
         ax[i].set_ylim([ymin, ymax])
     # Save the plots
-    plt.savefig("./data/raw_signals.png")
+    plt.savefig("./data/simulation_data/raw_signals.png")
     plt.show(block=False)
