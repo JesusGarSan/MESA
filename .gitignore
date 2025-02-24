@@ -1,7 +1,9 @@
 **/__pycache__
 .vscode
 
-/data/
-/simulation_data/
+/data/*.mat
+/data/*.png
+/simulation_data/*.mat
+/simulation_data/*.png
 
 *.asvgi
