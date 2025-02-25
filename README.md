@@ -1,20 +1,37 @@
-# DFT_MEDA
+# DFT MEDA (WIP. Current contents are placeholders)
 
-This repository contains code used for refining the DFT into MEDA pipeline for spatio temporal data. The case scenario we are trying to cover is using the frequency espectra of the signals measured by different spacially located sensors.
+This project is structured to analyze data using Python and MATLAB. The project structure is divided into four main directories: `data/`, `simulation/`, `features/`, and `meda/`.
 
-./functions contains the files with the functiosn used for simulating data, plotting it, extracting features from the signals and testing.
+## Project Structure
 
-./data contains the data (real or simulated) to analyze with MEDA
+- **data/**: Contains the data to be analyzed.
+- **simulation/**: A module that contains the code used to generate simulated data.
+- **features/**: A module that contains the code used to extract features from the signals.
+- **meda/**: A module that contains the code used to apply multivariate analysis to the feature data. The code in this folder is in MATLAB.
 
-./simulation_cata contains the data that was used for generating the sinthetic sygnals.
+## Requirements
 
-main.py is a demo file showcasing the different functionalities implemented.
+- Python 3.x
+- MATLAB R2021a or later
+- Necessary Python libraries (specified in `requirements.txt`)
 
-Processor.py contains the Processor class, used for working with the signal data.
+## Installation
 
-generate_data.py is the script that generates sinthetic data given certain parameters.
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/your_username/your_project.git
+    cd your_project
+    ```
 
-main.m is a MATLAB script that runs the MEDA script on the data.
+2. Install the necessary libraries:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-run.mat in a script that runst generate_data.py and main.m one after the other.
+## Usage
 
+### Generate Simulated Data
+
+To generate simulated data, run the following command:
+```bash
+python simulation/generate_data.py

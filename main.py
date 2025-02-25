@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from simulation.functions import *
-from feature_extraction.functions import *
+from features.functions import *
 import plot
 from tests import Parseval
 from Processor import Processor

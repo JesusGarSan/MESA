@@ -1,5 +1,7 @@
 import numpy as np
-from feature_extraction.functions import *
+import os, sys
+sys.path.insert(1, os.getcwd())
+from simulation.functions import *
 import plot as plot
 from tests import *
 

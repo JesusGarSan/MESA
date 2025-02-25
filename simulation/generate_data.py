@@ -3,7 +3,7 @@ import sys
 sys.path.insert(1, os.getcwd())
 
 from simulation.functions import *
-from feature_extraction.functions import *
+from features.functions import *
 from tests import *
 from Processor import Processor
 
@@ -68,7 +68,7 @@ for i in range(n_sensors):
     """ Create signal object """
     sensors.append(Processor(y, sr))
 
-    """ Apply windowing and calculate FFT"""
+    """ Apply windowing and calculate FFT """
     sensors[i].set_windows(window, shift);
     sensors[i].fft_bin_window(n_bins)
     sensors[i].check_fft()
