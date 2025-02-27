@@ -2,11 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from simulation.functions import *
-from features.functions import *
-import plot
-from tests import Parseval
-from Processor import Processor
+from internal import *
 
 
 if __name__ == "__main__":
@@ -16,13 +12,14 @@ if __name__ == "__main__":
     sr = 100;       # Hz. Sampling rate
     t = 10;         # s. Duration of the signal
     n_bins = 1000;  # Number of bins to use for the DFT calculation
-    N = 10000;      # Number of different frequencies composing the signal
+    N = 1000;       # Number of different frequencies composing the signal
 
     
     """ Generate the signal """
-    freq = generate_frequencies(N, sr=sr);
+    freq = generate_frequencies(N,sigma=0.5, f0=15, sr=sr);
     A = generate_amplitudes(N, sigma= 10);
-    x, y = generate_signal(freq, A, t=t, sr=sr);
+    phi = generate_phase(N)
+    x, y = generate_signal(freq, A, t=t, phi=phi, sr=sr);
 
 
     """ Add high frequency noise """

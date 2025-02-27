@@ -2,10 +2,7 @@ import os
 import sys
 sys.path.insert(1, os.getcwd())
 
-from simulation.functions import *
-from features.functions import *
-from tests import *
-from Processor import Processor
+from internal import *
 
 """ Set the parameters """
 sr = 100;       # Hz. Sampling rate
@@ -25,7 +22,7 @@ sensors = []
 
 print(f"FFT resolution: {sr/n_bins}Hz")
 print(f"True FFT resolution: {sr/(window*sr)}Hz")
-bins_check(sr, window, n_bins)
+test.bins_check(sr, window, n_bins)
 
 plot = True
 if plot: 

@@ -1,9 +1,5 @@
 import numpy as np
-import os, sys
-sys.path.insert(1, os.getcwd())
-from simulation.functions import *
-import plot as plot
-from tests import *
+from internal import *
 
 class Processor:
     def __init__(self, signal, sample_rate, x=None):
@@ -25,9 +21,9 @@ class Processor:
 
     def check(self):
         print(f"""
-        signal duration:{self.duration} s
-        sample rate:    {self.sr} Hz
-        Nº samples:     {self.n_samples}
+        signal duration: {self.duration} s
+        sample rate:     {self.sr} Hz
+        Nº samples:      {self.n_samples}
         """)
         
     def check_fft(self):
@@ -44,7 +40,7 @@ class Processor:
         """)
 
     def Parseval(self, verbose=True):
-        Parseval(self.signal, self.fft, verbose)
+        test.Parseval(self.signal, self.fft, verbose)
 
 
     """ Feature extraction functions """
