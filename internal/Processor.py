@@ -14,6 +14,7 @@ class Processor:
         self.window = None
         self.shift = None
         self.overlap = None
+        self.N_windows = None
 
         if x == None:
             self.x = np.linspace(0, self.duration, self.n_samples)
@@ -42,6 +43,11 @@ class Processor:
     def Parseval(self, verbose=True):
         test.Parseval(self.signal, self.fft, verbose)
 
+    def bins_check(self):
+        test.bins_check(self.sr, self.duration, self.n_bins)
+
+    def bins_check_window(self):
+        test.bins_check(self.sr, self.window, self.n_bins)
 
     """ Feature extraction functions """
     def fft_bin(self, n_bins):

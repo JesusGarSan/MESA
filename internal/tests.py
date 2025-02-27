@@ -29,6 +29,6 @@ def bins_check(sr, t, n_bins):
     # sr:       (Hz) Sampling rate
     # t:        (s) Duration of the signal
     # n_bins:   Number of different frequencies composing the signal
-    if n_bins > int(sr*t):
+    if n_bins < int(sr*t):
         print(f"Warning!\n  The number of FFT bins ({n_bins}) is smaller than the number of time samples ({int(sr*t)}). ")
     return
