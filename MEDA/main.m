@@ -1,10 +1,12 @@
 %%
-clc 
-close all
+% clc 
+% close all
 
 %% Load the data files together
-files = dir('data/simulation_data/empirical_data/*.mat');
-files = dir('data/simulation_data/theoretical_data/*.mat');
+cd('..')
+ls
+% files = dir('data/simulation_data/empirical_data/*.mat'); tit = "Empirical data"
+files = dir('data/simulation_data/theoretical_data/*.mat'); tit = "Theoretical data"
 
 data = [];
 var_class = [];
@@ -50,13 +52,14 @@ var_PC1 = 100*d(1)/model.var;
 %% Plot scores
 disp("Displaying scores plot")
 scores(model, 'ObsLabel', 1:size(data, 1), 'ObsClass', 1:size(data, 1));
-title('Time')
+title("Time - " + tit);
 
 %% Plot loadings
 disp("Displaying loadings plot")
 loadings(model, 'VarsLabel', var_l, 'VarsClass', var_class, 'Color', 'okabeIto', ...
     'BlurIndex', .3);
 legend()
+title(tit);
 
 %%
 disp("MEDA analysis completed.")
