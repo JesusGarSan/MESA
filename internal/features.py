@@ -6,7 +6,7 @@ We want to be able to apply overlap and windowing
 import numpy as np
 import scipy
 
-def fft_bin(signal:float, n_bins:int, sr:float):
+def fft(signal:float, n_bins:int, sr:float):
     fft = np.fft.fft(signal, n=n_bins)
     freqs = np.fft.fftfreq(n_bins, d=1/sr)    
     return fft, freqs

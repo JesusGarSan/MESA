@@ -40,3 +40,8 @@ def fft(fft_freq, fft, mode = 'module'):
         ax[1].grid()
         ax[1].set_xlabel("Frequencies (Hz)")
     return fig
+
+def spectrogram(t, f, Sxx):
+    fig, ax = plt.subplots()
+    plt.pcolormesh(t, f, Sxx)
+    return fig
