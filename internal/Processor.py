@@ -3,7 +3,7 @@ from internal import *
 from scipy.signal import ShortTimeFFT
 
 class Processor(ShortTimeFFT):
-    def __init__(self, signal, sample_rate, x=None):
+    def __init__(self, signal, sample_rate, time=None):
         self.signal = signal
         self.sr = sample_rate
 
@@ -17,9 +17,9 @@ class Processor(ShortTimeFFT):
         self.overlap = None
         self.N_windows = None
 
-        if x == None:
-            self.x = np.linspace(0, self.duration, self.n_samples)
-        else: self.x = x
+        if time == None:
+            self.timeime = np.linspace(0, self.duration, self.n_samples)
+        else: self.time = time
 
     def check(self):
         print(f"""
@@ -136,7 +136,7 @@ class Processor(ShortTimeFFT):
         
     """ Plotting functions """
     def plot_signal(self):
-        return plot.signal(self.x, self.signal)
+        return plot.signal(self.time, self.signal)
     def plot_fft(self, mode = 'module'):
         return plot.fft(self.freqs, self.fft, mode)
     def plot_spectrogram(self):
