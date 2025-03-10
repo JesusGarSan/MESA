@@ -15,11 +15,11 @@ def generate_signal(freq:float, A:float, sr = 100.0, t = 1.0, phi:float=0, verbo
     if verbose:
         print(f"""Maximum observable frequency (Nyquist): {sr/2}Hz""")
 
-    x = np.linspace(0, t, int(t*sr))
-    y = A*np.sin(np.outer(x, 2*np.pi*freq)+phi)
+    time = np.linspace(0, t, int(t*sr))
+    y = A*np.sin(np.outer(time, 2*np.pi*freq)+phi)
     y = np.sum(y, axis = 1)
 
-    return x, y 
+    return time, y 
 
 def generate_frequencies(N, sigma = 0.1, mode = 'random', f0 = None, sr:float = 100.0):
     f_Ny = sr/2; # Won't generate frequencies higher than what's observable via Nyquist
@@ -78,8 +78,13 @@ class Generator():
 
 
         M = len(f0)
+        if len(A0)==1 and A0==1.0: A0 = np.array([A0[0]]*M)
         assert len(A0) == M, f"A0 should have the same number of elements than f0 ({M})"
+
+        if len(sigma_f)==1: sigma_f = np.array([sigma_f[0]]*M)
         assert len(sigma_f) == M, f"sigma_f should have the same number of elements than f0 ({M})"
+
+        if len(sigma_A)==1: sigma_A = np.array([sigma_A[0]]*M)
         assert len(sigma_A) == M, f"sigma_A should have the same number of elements than f0 ({M})"
 
 
@@ -113,10 +118,10 @@ class Generator():
         self.amplitudes = self.amplitudes[sort_ids]
         self.phases = self.phases[sort_ids]
 
-        self.signal = generate_signal(self.frequencies,self.amplitudes,self.sr,
+        self.time, self.signal = generate_signal(self.frequencies,self.amplitudes,self.sr,
                                       self.duration,self.phases)
         
-        return self.signal
+        return self.time, self.signal
 
 
     def check(self):
@@ -130,7 +135,7 @@ class Generator():
     def plot(self):
         import matplotlib.pyplot as plt
         width = np.min(np.diff(self.frequencies))
-        width = width*self.N
+        width = width*self.N*self.M
         plt.bar(self.frequencies, self.amplitudes, width)
         plt.xlabel("Frequencies (Hz)")
         plt.ylabel("Amplitudes")
@@ -139,9 +144,6 @@ class Generator():
         
         
         
-
-
-
 
 if __name__ == '__main__':
 

@@ -1,4 +1,4 @@
-from internal.generator import *
+from internal.generator import Generator
 from internal.features import * 
 import internal.plot as plot
 import internal.tests as test

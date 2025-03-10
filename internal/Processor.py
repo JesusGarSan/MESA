@@ -17,8 +17,8 @@ class Processor(ShortTimeFFT):
         self.overlap = None
         self.N_windows = None
 
-        if time == None:
-            self.timeime = np.linspace(0, self.duration, self.n_samples)
+        if time is None:
+            self.time = np.linspace(0, self.duration, self.n_samples)
         else: self.time = time
 
     def check(self):
