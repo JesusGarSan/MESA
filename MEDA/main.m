@@ -5,8 +5,8 @@
 %% Load the data files together
 cd('..')
 ls
-% files = dir('data/simulation_data/empirical_data/*.mat'); tit = "Empirical data"
-files = dir('data/simulation_data/theoretical_data/*.mat'); tit = "Theoretical data"
+files = dir('data/simulation_data/empirical_data/*.mat'); tit = "Empirical data"
+% files = dir('data/simulation_data/theoretical_data/*.mat'); tit = "Theoretical data"
 
 data = [];
 var_class = [];
