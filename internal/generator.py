@@ -42,8 +42,10 @@ def generate_phase(N):
     phi = np.random.rand(N)*np.pi*2
     return phi
 
+def save(f, A, phi, convolution):
+    
+    return
 
-""" Generator class """
 class Generator():
 
     def __init__(self, sr:float=100.0, duration:float=10, N:int=100,

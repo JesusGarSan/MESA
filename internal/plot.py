@@ -9,7 +9,7 @@ def signal(x, y):
     plt.ylabel("Amplitude")
     plt.grid()
     plt.xlim(x[0], x[-1])
-    return fig
+    return fig, ax
 
 def fft(fft_freq, fft, mode = 'module'):
     # Only positive values for plotting
@@ -39,9 +39,13 @@ def fft(fft_freq, fft, mode = 'module'):
         ax[1].set_xlim(fft_freq_positive[0]-1, fft_freq_positive[-1]+1)
         ax[1].grid()
         ax[1].set_xlabel("Frequencies (Hz)")
-    return fig
+    return fig, ax
 
-def spectrogram(t, f, Sxx):
+def spectrogram(t, f, Sxx, show = False):
     fig, ax = plt.subplots()
     plt.pcolormesh(t, f, Sxx)
-    return fig
+    plt.xlabel("Time (s)")
+    plt.ylabel("Frequency (Hz)")
+    plt.colorbar()
+    if show: plt.show()
+    return fig, ax

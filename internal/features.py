@@ -12,13 +12,27 @@ def fft(signal:float, n_bins:int, sr:float):
     return fft, freqs
 
 
-def save(matrix, column_names = None, filepath="./output.mat"):
-    dict = {'matrix': matrix}
+def save(matrix, row_labels = None, column_labels = None, filepath="./output.mat", verbose = False):
+    saved = False
+    try:
+        dict = {'matrix': matrix}
 
-    if column_names is not None:
-        if len(column_names) != matrix.shape[1]:
-            raise ValueError("The number of column names does not match the number of columns in the matrix.")
-        dict['column_names'] = column_names
+        if row_labels is not None:
+            if len(row_labels) != matrix.shape[0]:
+                raise ValueError("The number of row labels does not match the number of rows in the matrix.")
+            dict['row_labels'] = row_labels
 
-    scipy.io.savemat(filepath, dict)
-    return True
+        if column_labels is not None:
+            if len(column_labels) != matrix.shape[1]:
+                raise ValueError("The number of column labels does not match the number of columns in the matrix.")
+            dict['column_labels'] = column_labels
+
+        scipy.io.savemat(filepath, dict)
+        saved=True
+
+    finally:
+        if verbose:
+            if saved: print(f"File saved successfully at {filepath}.")
+            else: print(f"Failed to save file at {filepath}.")
+
+    return saved
