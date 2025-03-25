@@ -41,9 +41,11 @@ def fft(fft_freq, fft, mode = 'module'):
         ax[1].set_xlabel("Frequencies (Hz)")
     return fig, ax
 
-def spectrogram(t, f, Sxx, show = False):
+def spectrogram(t, f, Sxx, xlim=None, show = False):
     fig, ax = plt.subplots()
     plt.pcolormesh(t, f, Sxx)
+    if xlim is not None:
+        plt.xlim(xlim[0], xlim[1])
     plt.xlabel("Time (s)")
     plt.ylabel("Frequency (Hz)")
     plt.colorbar()
