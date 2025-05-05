@@ -20,5 +20,10 @@ def save(matrix, column_names = None, filepath="./output.mat"):
             raise ValueError("The number of column names does not match the number of columns in the matrix.")
         dict['column_names'] = column_names
 
-    scipy.io.savemat(filepath, dict)
+    try:
+        scipy.io.savemat(filepath, dict)
+    except Exception as e:
+        print(e)
+        return False
+        
     return True

@@ -2,5 +2,6 @@
 .vscode
 
 /data/*
+!/data/*here*
 
 *.asvgi
