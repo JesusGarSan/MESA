@@ -47,3 +47,14 @@ def test_save():
     feature_extraction.features.save(fft, freqs, path+"matrix.mat")
     assert os.path.exists(path+"matrix.mat")
 
+
+
+def test_stft():
+    freq, time, Zxx = feature_extraction.features.stft(y,sr,None,int(0.5*sr),0,get_bins(sr, t),False,)
+
+    from visualization import plot
+    fig = plot.spectrogram(time, freq, Zxx)
+    fig.savefig("tests/plots/spectrogram.png")
+
+
+    return
