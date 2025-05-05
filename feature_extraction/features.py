@@ -31,6 +31,25 @@ def save(matrix, column_names = None, filepath=".data/matrix.mat"):
         
     return True
 
+def stft(signal, sr, win_samples, window = "boxcar", padding="odd", t_phase = 0):
+    win = scipy.signal.get_window(window, win_samples)
+    SFT = ShortTimeFFT(win,win_samples,sr)
+
+    time = SFT.t(len(signal)) + t_phase
+    freq = SFT.f
+    Zxx = SFT.stft(signal, padding=padding)
+
+    return time, freq, Zxx
+
+def spectrogram(signal, sr, win_samples, window = "boxcar", padding="odd", t_phase = 0):
+    win = scipy.signal.get_window(window, win_samples)
+    SFT = ShortTimeFFT(win,win_samples,sr)
+
+    time = SFT.t(len(signal)) + t_phase
+    freq = SFT.f
+    Zxx = SFT.spectrogram(signal, padding=padding)
+
+    return time, freq, Zxx
 
 
 
@@ -57,8 +76,8 @@ if __name__ == '__main__':
     convolution = 1* np.exp(-(x_aux/10)**2)
     y *= convolution
 
-    fig = plot.signal(x,y)
-    fig.show()
+    # fig = plot.signal(x,y)
+    # fig.show()
     
     from scipy.signal import ShortTimeFFT
 
@@ -70,11 +89,13 @@ if __name__ == '__main__':
     # Compute the STFT
     Zxx = SFT.spectrogram(y,padding="odd")
 
+    time, freq, Zxx = spectrogram(y, sr, win_samples, "boxcar", "odd", 1/2)
 
-    
+
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots()
-    plt.pcolormesh(range(len(Zxx[0])), SFT.f, Zxx)
+    # plt.pcolormesh(np.array(range(len(Zxx[0])))+0.5, SFT.f, Zxx)
+    plt.pcolormesh(SFT.t(len(y))+0.5, SFT.f, Zxx)
     plt.xlabel("Time (s)")
     plt.ylabel("Frequency (Hz)")
     plt.colorbar()
