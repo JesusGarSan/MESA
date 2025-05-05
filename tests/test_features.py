@@ -38,5 +38,12 @@ def test_fft_bin_under_energy():
 
 
 def test_save():
-    return
+    import os
+    path = "tests/data/"
+    if not os.path.exists(path): os.makedirs(path)
+    fft, freqs = feature_extraction.features.fft_bin(signal=y, n_bins=get_bins(sr, t), sr=sr)
+
+    print(freqs.shape, fft.shape)
+    feature_extraction.features.save(fft, freqs, path+"matrix.mat")
+    assert os.path.exists(path+"matrix.mat")
 

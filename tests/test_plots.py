@@ -1,11 +1,15 @@
-import feature_extraction.energy_check
 import feature_extraction.features
 import simulation.generator as generator
 import feature_extraction
 from feature_extraction.energy_check import get_bins
 import visualization.plot as plot
 
-import numpy as np
+import os
+path = "tests/plots/"
+if not os.path.exists(path): os.makedirs(path)
+
+from pathlib import Path
+Path("/my/directory").mkdir(parents=True, exist_ok=True)
 
 N, sr, t = 10, 100, 2
 f0 = [5., 15., 25.]
@@ -19,11 +23,17 @@ x, y = generator.generate_signal(F, A, sr, t, phi)
 
 def test_plot_signal():
     fig = plot.signal(x,y)
-    fig.savefig("tests/plots/signal.png")
+    fig.savefig(path+"signal.png")
+    assert os.path.exists(path+"signal.png")
 
+def test_plot_fft():
     fft, freqs = feature_extraction.features.fft_bin(signal=y, n_bins=get_bins(sr, t), sr=sr)
+
     fig = plot.fft(freqs, fft,"module")
-    fig.savefig("tests/plots/fft_module.png")
+    fig.savefig(path+"fft_module.png")
+    assert os.path.exists(path+"fft_module.png")
+
     fig = plot.fft(freqs, fft,"unfold")
-    fig.savefig("tests/plots/fft_unfolded.png")
+    fig.savefig(path+"fft_unfolded.png")
+    assert os.path.exists(path+"fft_unfolded.png")
 

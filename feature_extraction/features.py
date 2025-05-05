@@ -14,6 +14,8 @@ def fft_bin(signal:float, n_bins:int, sr:float):
 
 def save(matrix, column_names = None, filepath=".data/matrix.mat"):
     dict = {'matrix': matrix}
+    # Turn 1D arrays into row arrays
+    if len(matrix.shape) == 1: matrix = matrix[np.newaxis, :]
 
     if column_names is not None:
         if len(column_names) != matrix.shape[1]:
