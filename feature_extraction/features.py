@@ -12,7 +12,7 @@ def fft_bin(signal:float, n_bins:int, sr:float):
     return fft, freqs
 
 
-def save(matrix, column_names = None, filepath="./output.mat"):
+def save(matrix, column_names = None, filepath=".data/matrix.mat"):
     dict = {'matrix': matrix}
 
     if column_names is not None:
@@ -27,3 +27,9 @@ def save(matrix, column_names = None, filepath="./output.mat"):
         return False
         
     return True
+
+
+def stft(signal, sr, window, windowing, overlap):
+
+    matrix = 0
+    return matrix

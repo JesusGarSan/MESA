@@ -34,3 +34,6 @@ def bins_check(sr, t, n_bins):
     if n_bins > int(sr*t):
         print(f"Warning!\n  The number of FFT bins ({n_bins}) is greater than the number of time samples ({int(sr*t)}). The resulting frequency resolution will not be accurate")
     return
+
+def get_bins(sr, t):
+    return int(sr*t)
