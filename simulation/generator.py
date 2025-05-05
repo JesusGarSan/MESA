@@ -34,12 +34,13 @@ def generate_signal(freq:float, A:float, sr = 100.0, t = 1.0, phi:float=0, verbo
     return x, y 
 
 def generate_frequencies(N, sigma = 0.1, f0 = None, mode = 'random', sr:float = 100.0):
+    if f0 is None:
+        f_Ny = sr/2; # Won't generate frequencies higher than what's observable via Nyquist
+        f0 = [np.random.rand(N) * f_Ny] # Central frequency
+        
     f0 = f0 if hasattr(f0, '__iter__') else [f0]
 
     if mode == 'random':    
-        if f0 is None:
-            f_Ny = sr/2; # Won't generate frequencies higher than what's observable via Nyquist
-            f0 = [np.random.rand(N) * f_Ny] # Central frequency
 
         frequencies = np.zeros(N*len(f0))
         for i, f  in enumerate(f0):
