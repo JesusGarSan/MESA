@@ -64,3 +64,14 @@ def generate_amplitudes(N, center=100, sigma = 1, mode = 'random'):
 def generate_phase(N):
     phi = np.random.rand(N)*np.pi*2
     return phi
+
+
+def ground_truth(F, A, phi, sr, convolution = None):
+    """ WIP """
+    x, y = generate_signal(F, A, t=t, sr=sr, phi=phi);
+
+    wave = np.sin(np.outer(x, np.pi*2*F)+phi)
+    if convolution is None: convolution = np.ones(len(wave))
+    data = np.abs(wave * convolution[:, np.newaxis]) # We take the absolute value of the final signal
+    data *= A
+    return data
