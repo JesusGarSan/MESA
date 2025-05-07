@@ -4,11 +4,11 @@ from internal.feature_extraction.energy_check import get_bins
 from internal.visualization import plot
 
 import os
-path = "tests/plots/"
+path = "external/tests/plots/"
 if not os.path.exists(path): os.makedirs(path)
 
 from pathlib import Path
-Path("/my/directory").mkdir(parents=True, exist_ok=True)
+Path(path).mkdir(parents=True, exist_ok=True)
 
 N, sr, t = 10, 100, 2
 f0 = [5., 15., 25.]

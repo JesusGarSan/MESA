@@ -4,10 +4,11 @@ from internal.feature_extraction import features
 from internal.feature_extraction.energy_check import get_bins
 from internal.visualization import plot
 
-import internal
 
 import numpy as np
 import os
+
+path = "external/tests/data/"
 
 N, sr, t = 10, 100, 2
 f0 = [5., 15., 25.]
@@ -41,7 +42,6 @@ def test_fft_bin_under_energy():
 
 
 def test_save():
-    path = "tests/data/"
     if not os.path.exists(path): os.makedirs(path)
     fft, freqs = features.fft_bin(signal=y, n_bins=get_bins(sr, t), sr=sr)
 
@@ -58,7 +58,7 @@ A = generator.generate_amplitudes(N, A0,sigma=0.)
 phi=0.0
 
 def test_spectrogram():
-    path = "tests/plots/"
+    path = "external/tests/plots/"
     if not os.path.exists(path): os.makedirs(path)
     x, y = generator.generate_signal(F, A, sr, t, phi)
     x_aux = x - t/2 # Peak on the middle of the signal
@@ -68,7 +68,7 @@ def test_spectrogram():
     win_length = 1 #s
     win_samples = int(win_length*sr)
 
-    time, freq, Sxx = features.spectrogram(y, sr, win_samples,"boxcar", "odd", win_length/2)
+    time, freq, Sxx = features.spectrogram(y, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
     fig, ax =plot.spectrogram(time, freq, Sxx)
     fig.savefig(path+"/spectrogram.png")
     assert os.path.exists(path+"spectrogram.png")
