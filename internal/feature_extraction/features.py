@@ -14,10 +14,15 @@ def fft_bin(signal:float, n_bins:int, sr:float):
     return fft, freqs
 
 
-def save(matrix, column_names = None, filepath=".data/matrix.mat"):
+def save(filepath, matrix, row_names = None, column_names = None):
     dict = {'matrix': matrix}
     # Turn 1D arrays into row arrays
     if len(matrix.shape) == 1: matrix = matrix[np.newaxis, :]
+
+    if row_names is not None:
+        if len(row_names) != matrix.shape[0]:
+            raise ValueError("The number of row names does not match the number of rows in the matrix.")
+        dict['row_names'] = row_names
 
     if column_names is not None:
         if len(column_names) != matrix.shape[1]:
@@ -32,6 +37,35 @@ def save(matrix, column_names = None, filepath=".data/matrix.mat"):
         
     return True
 
+def load(filepath):
+    """
+    Loads the data saved by the 'save' function from a .mat file.
+
+    Args:
+        filepath (str): The path to the .mat file.
+
+    Returns:
+        tuple: A tuple containing the loaded matrix and, if it exists,
+               the list of column names. Returns (None, None) if any
+               error occurs during loading.
+    """
+    try:
+        loaded_data = scipy.io.loadmat(filepath)
+        matrix = loaded_data.get('matrix')
+        column_names = loaded_data.get('column_names')
+
+        # If a 1D array was saved, loadmat loads it as a row matrix,
+        # here we return it to its original 1D shape if necessary.
+        if matrix is not None and matrix.shape[0] == 1 and 'column_names' not in loaded_data:
+            matrix = matrix.flatten()
+
+        return matrix, column_names if column_names is not None else None
+    except FileNotFoundError:
+        print(f"Error: File not found at path: {filepath}")
+        return None, None
+    except Exception as e:
+        print(f"An error occurred while loading the file: {e}")
+        return None, None
 
 
 def stft(signal, sr, win_samples, window = "boxcar", padding="odd", t_phase = 0):

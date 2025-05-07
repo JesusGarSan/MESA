@@ -45,7 +45,7 @@ def test_save():
     if not os.path.exists(path): os.makedirs(path)
     fft, freqs = features.fft_bin(signal=y, n_bins=get_bins(sr, t), sr=sr)
 
-    features.save(fft, freqs, path+"matrix.mat")
+    features.save(path+"matrix.mat",fft, column_names=freqs)
     assert os.path.exists(path+"matrix.mat")
 
 
@@ -69,6 +69,6 @@ def test_spectrogram():
     win_samples = int(win_length*sr)
 
     time, freq, Sxx = features.spectrogram(y, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
-    fig, ax =plot.spectrogram(time, freq, Sxx)
+    fig, ax, _ =plot.spectrogram(time, freq, Sxx)
     fig.savefig(path+"/spectrogram.png")
     assert os.path.exists(path+"spectrogram.png")

@@ -2,15 +2,17 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import numpy as np
 
-def signal(x, y):
-    fig, ax = plt.subplots()
-    plt.title("Raw signal")
-    plt.plot(x,y)
-    plt.xlabel("Time")
-    plt.ylabel("Amplitude")
-    plt.grid()
-    plt.xlim(x[0], x[-1])
-    return fig
+def signal(x, y, ax = None):
+    if ax is None:
+        fig, ax = plt.subplots()
+        fig.suptitle("Raw signal")
+        fig.supxlabel("Time")
+        fig.supylabel("Amplitude")
+    else: fig = None
+    ax.plot(x,y)
+    ax.grid()
+    ax.set_xlim(x[0], x[-1])
+    return fig, ax
 
 def fft(fft_freq, fft, mode = 'module'):
     # Only positive values for plotting
@@ -43,7 +45,7 @@ def fft(fft_freq, fft, mode = 'module'):
     return fig
 
 
-def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, show:bool = False, vmin:float=None, vmax:float=None, logscale=False):
+def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, show:bool = False, vmin:float=None, vmax:float=None, logscale=False, ax = None):
     """
     Plots a spectrogram
 
@@ -60,7 +62,12 @@ def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, sho
     Returns:
         tuple: (fig, ax) - The figure and axes objects.
     """
-    fig, ax = plt.subplots()
+    if ax is None:
+        fig, ax = plt.subplots()
+        fig.suptitle("Raw signal")
+        fig.supxlabel("Time (s)")
+        fig.supylabel("Frequency (Hz)")
+    else: fig = None
 
     if logscale:
         norm = colors.LogNorm(vmin=vmin, vmax=vmax)  # Use LogNorm for logarithmic scaling
@@ -70,9 +77,11 @@ def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, sho
 
     if xlim is not None:
         plt.xlim(xlim[0], xlim[1])
-    ax.set_xlabel("Time (s)")
-    ax.set_ylabel("Frequency (Hz)")
     mesh.set_clim(vmin,vmax)
-    fig.colorbar(mesh, ax = ax)
+
+    if fig is not None:
+        fig.colorbar(mesh, ax = ax)
+    
     if show: plt.show()
-    return fig, ax
+    
+    return fig, ax, mesh

@@ -21,7 +21,7 @@ phi = generator.generate_phase(N*len(f0))
 x, y = generator.generate_signal(F, A, sr, t, phi)
 
 def test_plot_signal():
-    fig = plot.signal(x,y)
+    fig, ax = plot.signal(x,y)
     fig.savefig(path+"signal.png")
     assert os.path.exists(path+"signal.png")
 

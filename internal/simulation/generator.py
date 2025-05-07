@@ -33,7 +33,7 @@ def generate_signal(freq:float, A:float, sr = 100.0, t = 1.0, phi:float=0, verbo
 
     return x, y 
 
-def generate_frequencies(N, sigma = 0.1, f0 = None, mode = 'random', sr:float = 100.0):
+def generate_frequencies(N, f0 = None, sigma = 0.1, sr:float = 100.0, mode = 'random'):
     if f0 is None:
         f_Ny = sr/2; # Won't generate frequencies higher than what's observable via Nyquist
         f0 = [np.random.rand(N) * f_Ny] # Central frequency
@@ -66,9 +66,9 @@ def generate_phase(N):
     return phi
 
 
-def ground_truth(F, A, phi, sr, convolution = None):
+def ground_truth(F, A, phi, sr, t, convolution = None):
     """ WIP """
-    x, y = generate_signal(F, A, t=t, sr=sr, phi=phi);
+    x, y = generate_signal(F, A, sr, t, phi=phi);
 
     wave = np.sin(np.outer(x, np.pi*2*F)+phi)
     if convolution is None: convolution = np.ones(len(wave))
