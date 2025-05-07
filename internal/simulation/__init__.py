@@ -1,1 +1,1 @@
-from simulation.generator import *
+from .generator import *

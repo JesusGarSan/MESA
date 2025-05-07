@@ -1,4 +1,4 @@
-import simulation.generator as generator
+import internal.simulation.generator as generator
 
 def test_generator(N=10, sr = 10, t = 1.5, **kwargs):
     freq = generator.generate_frequencies(N, **kwargs)

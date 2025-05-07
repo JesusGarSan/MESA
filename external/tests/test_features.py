@@ -1,9 +1,10 @@
-import feature_extraction.energy_check
-import feature_extraction.features
-import simulation.generator as generator
-from feature_extraction import features 
-from feature_extraction.energy_check import get_bins
-from visualization import plot
+from internal.feature_extraction import energy_check
+from internal.simulation import generator
+from internal.feature_extraction import features 
+from internal.feature_extraction.energy_check import get_bins
+from internal.visualization import plot
+
+import internal
 
 import numpy as np
 import os
@@ -22,8 +23,8 @@ def test_fft_bin_energy():
     """ Check energy conservation with correct binning. """
     fft, freqs = features.fft_bin(signal=y, n_bins=get_bins(sr, t), sr=sr)
 
-    E_t = feature_extraction.energy_check.energy_t(y)
-    E_f = feature_extraction.energy_check.energy_f(fft)
+    E_t = energy_check.energy_t(y)
+    E_f = energy_check.energy_f(fft)
 
     print(E_t, E_f)
     assert np.isclose(E_t, E_f)
@@ -32,8 +33,8 @@ def test_fft_bin_under_energy():
     """ Check energy conservation with correct under-binning. """
     fft, freqs = features.fft_bin(signal=y, n_bins=get_bins(sr, t)//10, sr=sr)
 
-    E_t = feature_extraction.energy_check.energy_t(y)
-    E_f = feature_extraction.energy_check.energy_f(fft)
+    E_t = energy_check.energy_t(y)
+    E_f = energy_check.energy_f(fft)
 
     print(E_t, E_f)
     assert (E_t > E_f)
