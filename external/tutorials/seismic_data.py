@@ -1,50 +1,85 @@
+# %% Import libraries
+import os, sys
+sys.path.insert(1, os.getcwd())
+
+from internal.feature_extraction import features
+from internal.visualization import plot
+
 import obspy
 from obspy import UTCDateTime
 import numpy as np
+import matplotlib.pyplot as plt
 
-import os, sys
-sys.path.insert(1, os.getcwd())
-from internal.feature_extraction import features
-from internal.visualization import plot
-    
+# %% Execution parameters
+
+show_plots = True
+save_data = True
+
+# %% Read local data
 path = "./data/9F.NUPH..*.D.2021.143"
 st = obspy.read(path)
-st.trim(starttime = UTCDateTime("2021-05-23T12:00:00"), endtime = UTCDateTime("2021-05-23T16:00:00"))
-# st.resample(.1)
+
+# %% Pre-process the signal
+st.trim(starttime = UTCDateTime("2021-05-23T13:30:00"), endtime = UTCDateTime("2021-05-23T14:00:00"))
 st.detrend("demean")
-# st.plot(block=True)
-# quit()
 
+# %% Plot the signals
+st.plot(block=True)
 
+# %% STFT parameters
 n_channels = len(st)
+sr = st[0].stats.sampling_rate # We are assuming that all traces have the same sr
+window_length = 60.0     # s. Length of the windows in seconds
+window_samples = int(window_length*sr)
+shift  = window_length  # s. Length of the window shift in seconds
+n_bins = int(window_samples);  # Number of bins to use for the STFT calculation
 
-SR = np.zeros(n_channels)
-signals = []
+n_windows = int(st[0].stats.npts/window_samples) # We are assuming that all traces have the same number of points
+n_freqs = int((n_bins//2))
 
-for i, tr in enumerate(st):
-    signals.append(tr.data)
-    SR[i] = tr.stats.sampling_rate
-x = None
+# %% Calculate the STFT (Spectrogram)
+times_stft = np.zeros((n_channels, n_windows))
+freqs_stft = np.zeros((n_channels,n_freqs))
+Sxx = np.zeros((n_channels,n_freqs, n_windows))
 
-# quit()
+for i in range(n_channels):
+    time, freq, Sx = features.spectrogram(st[i].data, sr, window_samples, t_phase=window_length/2, n_bins=n_bins)
+    times_stft[i,:] = time[:-1]
+    freqs_stft[i,:] = freq[:-1]
+    Sxx[i,:,:] = Sx[:-1, :-1]
 
+# %% Plot the Spectrograms
+fig, axes = plt.subplots(n_channels, sharex=True)
+for i in range(n_channels):
+    _, axes[i], mesh = plot.spectrogram(times_stft[i], freqs_stft[i], Sxx[i], ax=axes[i], vmin=0, vmax=np.max(Sxx))
+    axes[i].set_ylabel(f"{st[i].stats.channel}")
+    axes[i].set_ylim(0,3)
 
-i = 1
-print(st[i].stats.channel)
-win_length = 3600 #s
-win_samples = int(win_length * SR[i])
+fig.subplots_adjust(right=0.8)
+cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+fig.colorbar(mesh, cax=cbar_ax)
 
-time, freq, Sxx = features.spectrogram(signals[i], SR[i], win_samples)
-fig, ax, _ = plot.spectrogram(time, freq, Sxx, logscale=True)
-
-# ax.set_ylim(0,.1)
+fig.supxlabel("Time")
+fig.supylabel("Frequency")
+fig.suptitle("Spectrograms")
 fig.show()
 
-fig, ax = plot.signal(np.arange(len(st[i])), st[i])
+# %% Save Spectrogram data
+if save_data:
+    for i in range(n_channels):
+        features.save(f"data/spectrogram_channel_{st[i].stats.channel}.mat",np.squeeze(Sxx[i]).T,row_names=times_stft[i],column_names=freqs_stft[i])
 
-fig.show()
-input()
+# %% Unfold the channels along the columns:
+print(Sxx.shape)
+n_sensors, n_rows, n_columns = Sxx.shape
+data = np.zeros((n_rows, n_columns*n_sensors))
+for i in range(n_sensors):
+    data[:, i*n_columns:(i+1)*n_columns] = Sxx[i]
 
+# %% Call Matlab to use the Meda Toolbox
+import subprocess
 
-
-
+matlab_script = 'seismic_signals_meda'
+subprocess.run(["matlab", "-nodesktop", "-nosplash", "-r", f"cd('external/tutorials'); {matlab_script};"])
+# %% Finish
+input("End?")

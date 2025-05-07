@@ -5,7 +5,7 @@
 %% Load the data files together
 cd('..')
 ls
-files = dir('../data/spectrogram_sensor*.mat'); tit = "Simulated data";
+files = dir('../data/spectrogram_channel*.mat'); tit = "Seismic data";
 % files = dir('data/simulation_data/theoretical_data/*.mat'); tit = "Theoretical data"
 
 data = [];
@@ -20,7 +20,7 @@ for i = 1:length(files)
     
     data = [data, matrix];
     var_l = [var_l, string(file_data.column_names)+" Hz"];
-    var_class = [var_class, repmat(["sensor "+ string(i)], 1, length(file_data.column_names))];
+    var_class = [var_class, repmat(["channel "+ string(i)], 1, length(file_data.column_names))];
 end
 
 
@@ -35,7 +35,7 @@ clear prep_methods
 %% Choosing the number of PCs
 % VarX + ckf
 disp("Displaying var+ckf plot")
-pcs = 0:20;
+pcs = 0:5;
 x_var = varPca(Xcs, 'Pcs', pcs, 'Preprocessing', 0, 'PlotCkf', true); 
 
 %% Create PCA model

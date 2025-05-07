@@ -9,9 +9,7 @@ from internal.visualization import plot
 from internal.meda.pca import *
 import matplotlib.pyplot as plt
 
-
 import numpy as np
-
 
 # %% Set the parameters
 show_plots = True
@@ -109,9 +107,6 @@ if show_plots:
 if save_data:
     for i in range(n_sensors):
         features.save(f"data/spectrogram_sensor_{i}.mat",np.squeeze(Sxx[i]).T,row_names=times_stft[i],column_names=freqs_stft[i])
-    pass
-
-
 
 # %% Unfold the sensors along the columns:
 print(Sxx.shape)
