@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 import numpy as np
 
 def signal(x, y):
@@ -42,13 +43,36 @@ def fft(fft_freq, fft, mode = 'module'):
     return fig
 
 
-def spectrogram(t, f, Sxx, xlim=None, show = False):
+def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, show:bool = False, vmin:float=None, vmax:float=None, logscale=False):
+    """
+    Plots a spectrogram
+
+    Args:
+        t (array_like): The times of the measurement.
+        f (array_like): The frequencies.
+        Sxx (array_like): The power spectral density.
+        xlim (tuple, optional): Limits for the x-axis (time). Defaults to None.
+        show (bool, optional): If True, displays the plot. Defaults to False.
+        vmin (float, optional): Minimum value for the color scale. Defaults to None.
+        vmax (float, optional): Maximum value for the color scale. Defaults to None.
+        logscale (bool, optional): If True, applies a logarithmic color scale. Defaults to False.
+
+    Returns:
+        tuple: (fig, ax) - The figure and axes objects.
+    """
     fig, ax = plt.subplots()
-    plt.pcolormesh(t, f, Sxx)
+
+    if logscale:
+        norm = colors.LogNorm(vmin=vmin, vmax=vmax)  # Use LogNorm for logarithmic scaling
+        mesh = ax.pcolormesh(t, f, Sxx, norm=norm)
+    else:
+        mesh = ax.pcolormesh(t, f, Sxx, vmin=vmin, vmax=vmax) # default linear scale
+
     if xlim is not None:
         plt.xlim(xlim[0], xlim[1])
-    plt.xlabel("Time (s)")
-    plt.ylabel("Frequency (Hz)")
-    plt.colorbar()
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel("Frequency (Hz)")
+    mesh.set_clim(vmin,vmax)
+    fig.colorbar(mesh, ax = ax)
     if show: plt.show()
     return fig, ax

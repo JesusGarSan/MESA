@@ -44,9 +44,9 @@ def stft(signal, sr, win_samples, window = "boxcar", padding="odd", t_phase = 0)
 
     return time, freq, Zxx
 
-def spectrogram(signal, sr, win_samples, window = "boxcar", padding="odd", t_phase = 0):
+def spectrogram(signal, sr, win_samples, window = "boxcar", padding="odd", n_bins:int = None, t_phase = 0):
     win = get_window(window, win_samples)
-    SFT = ShortTimeFFT(win,win_samples,sr)
+    SFT = ShortTimeFFT(win,win_samples,sr, mfft=n_bins)
 
     time = SFT.t(len(signal)) + t_phase
     freq = SFT.f
