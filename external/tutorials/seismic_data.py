@@ -35,12 +35,12 @@ win_length = 3600 #s
 win_samples = int(win_length * SR[i])
 
 time, freq, Sxx = features.spectrogram(signals[i], SR[i], win_samples)
-fig, ax = plot.spectrogram(time, freq, Sxx, logscale=True)
+fig, ax, _ = plot.spectrogram(time, freq, Sxx, logscale=True)
 
 # ax.set_ylim(0,.1)
 fig.show()
 
-fig = plot.signal(np.arange(len(st[i])), st[i])
+fig, ax = plot.signal(np.arange(len(st[i])), st[i])
 
 fig.show()
 input()

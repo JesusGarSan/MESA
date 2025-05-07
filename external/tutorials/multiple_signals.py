@@ -6,6 +6,7 @@ from internal.feature_extraction.energy_check import bins_check
 from internal.feature_extraction import features
 from internal.simulation.generator import *
 from internal.visualization import plot
+from internal.meda.pca import *
 import matplotlib.pyplot as plt
 
 
@@ -16,26 +17,26 @@ import numpy as np
 show_plots = True
 save_data = True
 
-sr = 100;       # Hz. Sampling rate
-t = 60;         # s. Duration of the signal
+sr = 50;       # Hz. Sampling rate
+t = 120;         # s. Duration of the signal
 N = 100;      # Number of different frequencies composing the signal
 n_samples = int(t*sr)
 
-window_length = 1.0     # s. Length of the windows in seconds
+window_length = 3.0     # s. Length of the windows in seconds
 window_samples = int(window_length*sr)
 shift  = window_length  # s. Length of the window shift in seconds
 n_bins = int(window_samples);  # Number of bins to use for the STFT calculation
 # n_bins = n_bins*10
+
 n_windows = int(t/window_length)
 n_freqs = int((n_bins//2))
 
 f0 = [12.0, 13.5, 22.0, 22.15, 32.0, 32.075 ] # Hz. Main frequencies of the simulated signals
-sigma_f = 7.5 # standard deviation around the frequencies chosen for the signal generation
+sigma_f = 3.5 # standard deviation around the frequencies chosen for the signal generation
 sigma_A = 0.5 # standard deviation around the amplitudes chosen for the signal generation
 m = len(f0)
 
 n_sensors = 5; # Number of sensors in the simulation
-sensors = []
 
 print(f"Forced FFT resolution: {sr/n_bins}Hz")
 print(f"True FFT resolution: {sr/(window_length*sr)}Hz")
@@ -58,6 +59,10 @@ for i in range(n_sensors):
     convolution = 1* np.exp(-(x_aux/10)**2)
     signals[i, :] *= convolution
 
+sort_id = A.argsort()
+main_F = F[sort_id]
+print(f"Main frequencies in order:\n {main_F}")
+
 # %% Plot the signals
 if show_plots:
     fig, axes = plt.subplots(n_sensors, sharex=True)
@@ -79,7 +84,7 @@ freqs_stft = np.zeros((n_sensors,n_freqs))
 Sxx = np.zeros((n_sensors,n_freqs, n_windows))
 
 for i in range(n_sensors):
-    time, freq, Sx = features.spectrogram(signals[i,:], sr, window_samples, t_phase=window_length/2)
+    time, freq, Sx = features.spectrogram(signals[i,:], sr, window_samples, t_phase=window_length/2, n_bins=n_bins)
     times_stft[i,:] = time[:-1]
     freqs_stft[i,:] = freq[:-1]
     Sxx[i,:,:] = Sx[:-1, :-1]
@@ -103,8 +108,34 @@ if show_plots:
 # %% Save Spectrogram data
 if save_data:
     for i in range(n_sensors):
-        features.save(f"data/spectrogram_sensor_{i}.mat",np.squeeze(Sxx[i]),freqs_stft[i])
+        features.save(f"data/spectrogram_sensor_{i}.mat",np.squeeze(Sxx[i]).T,row_names=times_stft[i],column_names=freqs_stft[i])
     pass
 
+
+
+# %% Unfold the sensors along the columns:
+print(Sxx.shape)
+n_sensors, n_rows, n_columns = Sxx.shape
+data = np.zeros((n_rows, n_columns*n_sensors))
+for i in range(n_sensors):
+    data[:, i*n_columns:(i+1)*n_columns] = Sxx[i]
+
+# %% Apply PCA analysis to the Spectrogram data
+
+# data = preprocess(data, None)
+# scores, loadings, exp_var = pca(data, 2)
+
+# print(times_stft.shape)
+# fig, ax = scores_plot(scores, exp_var, times_stft[0])
+# fig.show()
+# fig, ax = loadings_plot(loadings, exp_var, np.repeat([1,2,3,4,5],50))
+# fig.show()
+
+
+# %% Call Matlab to use the Meda Toolbox
+import subprocess
+
+matlab_script = 'multiple_signals_meda'
+subprocess.run(["matlab", "-nodesktop", "-nosplash", "-r", f"cd('external/tutorials'); {matlab_script};"])
 # %% Finish
 input("End?")

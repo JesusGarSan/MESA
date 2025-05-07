@@ -5,7 +5,7 @@
 %% Load the data files together
 cd('..')
 ls
-files = dir('data/simulation_data/empirical_data/*.mat'); tit = "Empirical data"
+files = dir('../data/spectrogram*.mat'); tit = "Empirical data";
 % files = dir('data/simulation_data/theoretical_data/*.mat'); tit = "Theoretical data"
 
 data = [];
@@ -14,11 +14,12 @@ var_l = [];
 
 for i = 1:length(files)
     file_data = load(fullfile(files(i).folder, files(i).name));
+
     
     matrix = file_data.matrix;
     
     data = [data, matrix];
-    var_l = [var_l; string(file_data.column_names)];
+    var_l = [var_l, string(file_data.column_names)+" Hz"];
     var_class = [var_class, repmat(["sensor "+ string(i)], 1, length(file_data.column_names))];
 end
 
