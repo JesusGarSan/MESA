@@ -22,9 +22,11 @@ st = obspy.read(path)
 # %% Pre-process the signal
 st.trim(starttime = UTCDateTime("2021-05-23T13:30:00"), endtime = UTCDateTime("2021-05-23T14:00:00"))
 st.detrend("demean")
+detrend = "constant" # Apply demean on each window
+# detrend = None # Don't apply demean on each window
 
 # %% Plot the signals
-st.plot(block=True)
+st.plot(block=False)
 
 # %% STFT parameters
 n_channels = len(st)
@@ -43,7 +45,7 @@ freqs_stft = np.zeros((n_channels,n_freqs))
 Sxx = np.zeros((n_channels,n_freqs, n_windows))
 
 for i in range(n_channels):
-    time, freq, Sx = features.spectrogram(st[i].data, sr, window_samples, t_phase=window_length/2, n_bins=n_bins)
+    time, freq, Sx = features.spectrogram(st[i].data, sr, window_samples, t_phase=window_length/2, n_bins=n_bins, detrend=detrend)
     times_stft[i,:] = time[:-1]
     freqs_stft[i,:] = freq[:-1]
     Sxx[i,:,:] = Sx[:-1, :-1]
@@ -51,9 +53,11 @@ for i in range(n_channels):
 # %% Plot the Spectrograms
 fig, axes = plt.subplots(n_channels, sharex=True)
 for i in range(n_channels):
-    _, axes[i], mesh = plot.spectrogram(times_stft[i], freqs_stft[i], Sxx[i], ax=axes[i], vmin=0, vmax=np.max(Sxx))
+    _, axes[i], mesh = plot.spectrogram(times_stft[i], freqs_stft[i], Sxx[i], ax=axes[i],
+                                        # vmin=0, vmax=np.max(Sxx),
+                                        logscale=True)
     axes[i].set_ylabel(f"{st[i].stats.channel}")
-    axes[i].set_ylim(0,3)
+    # axes[i].set_ylim(0,3)
 
 fig.subplots_adjust(right=0.8)
 cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
@@ -68,6 +72,7 @@ fig.show()
 if save_data:
     for i in range(n_channels):
         features.save(f"data/spectrogram_channel_{st[i].stats.channel}.mat",np.squeeze(Sxx[i]).T,row_names=times_stft[i],column_names=freqs_stft[i])
+        print(f"Data saved at: data/spectrogram_channel_{st[i].stats.channel}.mat")
 
 # %% Unfold the channels along the columns:
 print(Sxx.shape)
