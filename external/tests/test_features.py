@@ -49,18 +49,13 @@ def test_save():
     assert os.path.exists(path+"matrix.mat")
 
 
-N, sr, t = 10, 100, 10
-f0 = [5., 15., 25.]
-A0 = [10, 20, 15]
 
-F = generator.generate_frequencies(N, sigma=0.0, f0=f0)
-A = generator.generate_amplitudes(N, A0,sigma=0.)
-phi=0.0
-
-def test_spectrogram():
-    path = "external/tests/plots/"
-    if not os.path.exists(path): os.makedirs(path)
+def test_stft_spectrogram_equivalence():
+    N, sr, t = 10, 100, 10
+    F = generator.generate_frequencies(N, sigma=10.0, f0=f0)
+    A = generator.generate_amplitudes(N, A0,sigma=10.)
     x, y = generator.generate_signal(F, A, sr, t, phi)
+
     x_aux = x - t/2 # Peak on the middle of the signal
     convolution = 1* np.exp(-(x_aux/10)**2)
     y*=convolution
@@ -68,7 +63,6 @@ def test_spectrogram():
     win_length = 1 #s
     win_samples = int(win_length*sr)
 
-    time, freq, Sxx = features.spectrogram(y, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
-    fig, ax, _ =plot.spectrogram(time, freq, Sxx)
-    fig.savefig(path+"/spectrogram.png")
-    assert os.path.exists(path+"spectrogram.png")
+    time, freq, Sxx = features.spectrogram(y, sr, win_samples,"boxcar", "odd", t_phase =win_length/2, detrend="constant")
+    time, freq, Zxx = features.stft(y, sr, win_samples,"boxcar", "odd", t_phase =win_length/2, detrend="constant")
+    assert np.isclose(np.mean(Sxx), np.mean(Zxx.imag**2+Zxx.real**2))

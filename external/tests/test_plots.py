@@ -3,6 +3,8 @@ from internal.feature_extraction import features
 from internal.feature_extraction.energy_check import get_bins
 from internal.visualization import plot
 
+import numpy as np
+
 import os
 path = "external/tests/plots/"
 if not os.path.exists(path): os.makedirs(path)
@@ -36,3 +38,18 @@ def test_plot_fft():
     fig.savefig(path+"fft_unfolded.png")
     assert os.path.exists(path+"fft_unfolded.png")
 
+def test_plot_spectrogram():
+    path = "external/tests/plots/"
+    if not os.path.exists(path): os.makedirs(path)
+    x, y = generator.generate_signal(F, A, sr, t, phi)
+    x_aux = x - t/2 # Peak on the middle of the signal
+    convolution = 1* np.exp(-(x_aux/10)**2)
+    y*=convolution
+
+    win_length = 1 #s
+    win_samples = int(win_length*sr)
+
+    time, freq, Sxx = features.spectrogram(y, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
+    fig, ax, _ =plot.spectrogram(time, freq, Sxx)
+    fig.savefig(path+"/spectrogram.png")
+    assert os.path.exists(path+"spectrogram.png")
