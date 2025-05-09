@@ -21,12 +21,12 @@ st = obspy.read(path)
 
 # %% Pre-process the signal
 st.trim(starttime = UTCDateTime("2021-05-23T13:30:00"), endtime = UTCDateTime("2021-05-23T14:00:00"))
-st.detrend("demean")
+# st.detrend("demean")
 detrend = "constant" # Apply demean on each window
 # detrend = None # Don't apply demean on each window
 
 # %% Plot the signals
-st.plot(block=False)
+# st.plot(block=False)
 
 # %% STFT parameters
 n_channels = len(st)
@@ -42,13 +42,17 @@ n_freqs = int((n_bins//2))
 # %% Calculate the STFT (Spectrogram)
 times_stft = np.zeros((n_channels, n_windows))
 freqs_stft = np.zeros((n_channels,n_freqs))
+Zre = np.zeros((n_channels,n_freqs, n_windows))
+Zim = np.zeros((n_channels,n_freqs, n_windows))
 Sxx = np.zeros((n_channels,n_freqs, n_windows))
 
 for i in range(n_channels):
-    time, freq, Sx = features.spectrogram(st[i].data, sr, window_samples, t_phase=window_length/2, n_bins=n_bins, detrend=detrend)
+    time, freq, Sx = features.stft(st[i].data, sr, window_samples, t_phase=window_length/2, n_bins=n_bins, detrend=detrend)
     times_stft[i,:] = time[:-1]
     freqs_stft[i,:] = freq[:-1]
-    Sxx[i,:,:] = Sx[:-1, :-1]
+    Zre[i,:,:] = Sx[:-1, :-1].real
+    Zim[i,:,:] = Sx[:-1, :-1].imag
+Sxx = Zre**2 + Zim**2
 
 # %% Plot the Spectrograms
 fig, axes = plt.subplots(n_channels, sharex=True)

@@ -68,13 +68,13 @@ def load(filepath):
         return None, None
 
 
-def stft(signal, sr, win_samples, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = 0, **kwargs):
+def stft       (signal, sr, win_samples, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = 0, **kwargs):
     win = get_window(window, win_samples)
-    SFT = ShortTimeFFT(win,win_samples,sr)
+    SFT = ShortTimeFFT(win,win_samples,sr, mfft=n_bins)
 
     time = SFT.t(len(signal)) + t_phase
     freq = SFT.f
-    Zxx = SFT.stft(signal, padding=padding, detr=detrend, **kwargs)
+    Zxx = SFT.stft_detrend(signal, padding=padding, detr=detrend, **kwargs)
 
     return time, freq, Zxx
 
@@ -84,7 +84,7 @@ def spectrogram(signal, sr, win_samples, window = "boxcar", padding="odd", detre
 
     time = SFT.t(len(signal)) + t_phase
     freq = SFT.f
-    Zxx = SFT.spectrogram(signal, padding=padding, detr=detrend, **kwargs)
+    Sxx = SFT.spectrogram(signal, padding=padding, detr=detrend, **kwargs)
 
-    return time, freq, Zxx
+    return time, freq, Sxx
 

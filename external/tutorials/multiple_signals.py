@@ -87,6 +87,8 @@ for i in range(n_sensors):
     freqs_stft[i,:] = freq[:-1]
     Sxx[i,:,:] = Sx[:-1, :-1]
 
+
+
 # %% Plot the Spectrograms
 if show_plots:
     fig, axes = plt.subplots(n_sensors, sharex=True)
