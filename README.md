@@ -1,4 +1,6 @@
-# DFT MEDA (WIP. Current contents are placeholders)
+# MESA (Multivariate Exploratory Signal Analysis)
+
+
 
 This project is structured to analyze data using Python and MATLAB. The project structure is divided into four main directories: `data/`, `simulation/`, `features/`, and `meda/`.
 

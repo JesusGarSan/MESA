@@ -4,6 +4,7 @@ sys.path.insert(1, os.getcwd())
 
 from internal.feature_extraction import features
 from internal.visualization import plot
+from internal.meda import meda
 
 import obspy
 from obspy import UTCDateTime
@@ -12,8 +13,8 @@ import matplotlib.pyplot as plt
 
 # %% Execution parameters
 
-show_plots = True
-save_data = True
+show_plots = False
+save_data = False
 
 # %% Read local data
 path = "./data/9F.NUPH..*.D.2021.143"
@@ -55,22 +56,23 @@ for i in range(n_channels):
 Sxx = Zre**2 + Zim**2
 
 # %% Plot the Spectrograms
-fig, axes = plt.subplots(n_channels, sharex=True)
-for i in range(n_channels):
-    _, axes[i], mesh = plot.spectrogram(times_stft[i], freqs_stft[i], Sxx[i], ax=axes[i],
-                                        # vmin=0, vmax=np.max(Sxx),
-                                        logscale=True)
-    axes[i].set_ylabel(f"{st[i].stats.channel}")
-    # axes[i].set_ylim(0,3)
+if show_plots:
+    fig, axes = plt.subplots(n_channels, sharex=True)
+    for i in range(n_channels):
+        _, axes[i], mesh = plot.spectrogram(times_stft[i], freqs_stft[i], Sxx[i], ax=axes[i],
+                                            # vmin=0, vmax=np.max(Sxx),
+                                            logscale=True)
+        axes[i].set_ylabel(f"{st[i].stats.channel}")
+        # axes[i].set_ylim(0,3)
 
-fig.subplots_adjust(right=0.8)
-cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
-fig.colorbar(mesh, cax=cbar_ax)
+    fig.subplots_adjust(right=0.8)
+    cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+    fig.colorbar(mesh, cax=cbar_ax)
 
-fig.supxlabel("Time")
-fig.supylabel("Frequency")
-fig.suptitle("Spectrograms")
-fig.show()
+    fig.supxlabel("Time")
+    fig.supylabel("Frequency")
+    fig.suptitle("Spectrograms")
+    fig.show()
 
 # %% Save Spectrogram data
 if save_data:
@@ -79,16 +81,24 @@ if save_data:
         print(f"Data saved at: data/spectrogram_channel_{st[i].stats.channel}.mat")
 
 # %% Unfold the channels along the columns:
-print(Sxx.shape)
 n_sensors, n_rows, n_columns = Sxx.shape
 data = np.zeros((n_rows, n_columns*n_sensors))
 for i in range(n_sensors):
     data[:, i*n_columns:(i+1)*n_columns] = Sxx[i]
 
-# %% Call Matlab to use the Meda Toolbox
+# %% MEDA analysis
+# data = meda.preprocess(data, method="demean")
+# scores, loadings, exp_var = meda.pca(data, 2)
+# fig, ax = meda.scores_plot(scores, exp_var,)
+# fig.show()
+# fig, ax = meda.loadings_plot(loadings, exp_var,)
+# fig.show()
+
+# # %% Call Matlab to use the Meda Toolbox
 import subprocess
 
 matlab_script = 'seismic_signals_meda'
 subprocess.run(["matlab", "-nodesktop", "-nosplash", "-r", f"cd('external/tutorials'); {matlab_script};"])
+
 # %% Finish
 input("End?")

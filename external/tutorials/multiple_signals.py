@@ -6,7 +6,7 @@ from internal.feature_extraction.energy_check import bins_check
 from internal.feature_extraction import features
 from internal.simulation.generator import *
 from internal.visualization import plot
-from internal.meda.pca import *
+from internal.meda.meda import *
 import matplotlib.pyplot as plt
 
 import numpy as np
