@@ -4,7 +4,6 @@ from internal.feature_extraction import features
 from internal.feature_extraction.energy_check import get_bins
 from internal.visualization import plot
 
-
 import numpy as np
 import os
 

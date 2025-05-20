@@ -41,7 +41,15 @@ def test_plot_fft():
 def test_plot_spectrogram():
     path = "external/tests/plots/"
     if not os.path.exists(path): os.makedirs(path)
+
+    N, sr, t = 10, 100, 3
+    f0 = [5., 15., 25.]
+    A0 = [10, 20, 15]
+    F = generator.generate_frequencies(N, sigma=0.0, f0=f0)
+    A = generator.generate_amplitudes(N, A0,sigma=0.0)
+    phi=0
     x, y = generator.generate_signal(F, A, sr, t, phi)
+
     x_aux = x - t/2 # Peak on the middle of the signal
     convolution = 1* np.exp(-(x_aux/10)**2)
     y*=convolution
