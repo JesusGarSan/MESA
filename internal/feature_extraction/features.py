@@ -21,12 +21,12 @@ def save(filepath, matrix, row_names = None, column_names = None):
 
     if row_names is not None:
         if len(row_names) != matrix.shape[0]:
-            raise ValueError("The number of row names does not match the number of rows in the matrix.")
+            raise ValueError(f"The number of row names {len(row_names)}does not match the number of rows in the matrix {matrix.shape[0]}.")
         dict['row_names'] = row_names
 
     if column_names is not None:
         if len(column_names) != matrix.shape[1]:
-            raise ValueError("The number of column names does not match the number of columns in the matrix.")
+            raise ValueError(f"The number of column names {len(column_names)} does not match the number of columns in the matrix {matrix.shape[1]}.")
         dict['column_names'] = column_names
 
     try:
