@@ -1,0 +1,61 @@
+Metadata-Version: 2.4
+Name: msa
+Version: 0.1.0
+Summary: Multivariate Signal Analysis tools
+Author-email: JesusGarSan <gsus@ugr.es>
+License: MIT License
+Project-URL: Homepage, https://github.com/JesusGarSan/MESA
+Project-URL: Issues, https://github.com/JesusGarSan/MESA/issues
+Project-URL: Source, https://github.com/JesusGarSan/MESA
+Keywords: multivariate,analysis,meda,signal,signals,exploratory,python
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: matplotlib
+Requires-Dist: scipy
+Requires-Dist: scikit-learn
+
+# MESA (Multivariate Exploratory Signal Analysis)
+
+
+
+This project is structured to analyze data using Python and MATLAB. The project structure is divided into four main directories: `data/`, `simulation/`, `features/`, and `meda/`.
+
+## Project Structure
+
+- **data/**: Contains the data to be analyzed.
+- **simulation/**: A module that contains the code used to generate simulated data.
+- **features/**: A module that contains the code used to extract features from the signals.
+- **meda/**: A module that contains the code used to apply multivariate analysis to the feature data. The code in this folder is in MATLAB.
+
+## Requirements
+
+- Python 3.x
+- MATLAB R2021a or later
+- Necessary Python libraries (specified in `requirements.txt`)
+
+## Installation
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/your_username/your_project.git
+    cd your_project
+    ```
+
+2. Install the necessary libraries:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+## Usage
+
+### Generate Simulated Data
+
+To generate simulated data, run the following command:
+```bash
+python simulation/generate_data.py

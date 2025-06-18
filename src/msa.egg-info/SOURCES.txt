@@ -1,0 +1,15 @@
+README.md
+pyproject.toml
+src/msa/Signal.py
+src/msa/__init__.py
+src/msa.egg-info/PKG-INFO
+src/msa.egg-info/SOURCES.txt
+src/msa.egg-info/dependency_links.txt
+src/msa.egg-info/requires.txt
+src/msa.egg-info/top_level.txt
+src/msa/feature_extraction/energy_check.py
+src/msa/feature_extraction/features.py
+src/msa/meda/meda.py
+src/msa/simulation/__init__.py
+src/msa/simulation/generator.py
+src/msa/visualization/plot.py

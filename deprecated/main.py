@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from internal import *
+from src import *
 
 
 if __name__ == "__main__":

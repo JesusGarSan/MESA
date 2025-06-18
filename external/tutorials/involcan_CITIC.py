@@ -2,8 +2,8 @@
 import os, sys
 sys.path.insert(1, os.getcwd())
 
-from internal.feature_extraction import features
-from internal.visualization import plot
+from src.feature_extraction import features
+from src.visualization import plot
 # from internal.meda import meda
 
 import obspy

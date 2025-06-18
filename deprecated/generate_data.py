@@ -2,7 +2,7 @@ import os
 import sys
 sys.path.insert(1, os.getcwd())
 
-from internal import *
+from src import *
 
 """ Set the parameters """
 sr = 100;       # Hz. Sampling rate

@@ -2,11 +2,11 @@
 import os, sys
 sys.path.insert(1, os.getcwd())
 
-from internal.feature_extraction.energy_check import bins_check
-from internal.feature_extraction import features
-from internal.simulation.generator import *
-from internal.visualization import plot
-from internal.meda.meda import *
+from src.feature_extraction.energy_check import bins_check
+from src.feature_extraction import features
+from src.simulation.generator import *
+from src.visualization import plot
+from src.meda.meda import *
 import matplotlib.pyplot as plt
 
 import numpy as np

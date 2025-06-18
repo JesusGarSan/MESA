@@ -10,3 +10,7 @@
 /tests/plots/*
 
 .venv
+
+dist/
+
+deprecated/

@@ -1,7 +1,7 @@
-from internal.simulation import generator
-from internal.feature_extraction import features 
-from internal.feature_extraction.energy_check import get_bins
-from internal.visualization import plot
+from src.simulation import generator
+from src.feature_extraction import features 
+from src.feature_extraction.energy_check import get_bins
+from src.visualization import plot
 
 import numpy as np
 

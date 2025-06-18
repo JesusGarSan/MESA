@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "msa" 
+version = "0.1.0"
+authors = [
+  { name="JesusGarSan", email="gsus@ugr.es" },
+]
+description = "Multivariate Signal Analysis tools"
+readme = "README.md"
+requires-python = ">=3.12"
+keywords = ["multivariate", "analysis", "meda", "signal", "signals", "exploratory", "python"]
+license = { text = "MIT License" } 
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "scipy",
+    "scikit-learn"
+]
+
+[project.urls]
+Homepage = "https://github.com/JesusGarSan/MESA"
+Issues = "https://github.com/JesusGarSan/MESA/issues"
+Source = "https://github.com/JesusGarSan/MESA"
+
+[tool.setuptools.packages.find]
+where = ["src"] 

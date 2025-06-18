@@ -1,5 +1,5 @@
 import numpy as np
-from internal import *
+from src import *
 
 class Processor:
     def __init__(self, signal, sample_rate, x=None):
