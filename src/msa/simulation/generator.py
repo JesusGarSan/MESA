@@ -75,3 +75,11 @@ def ground_truth(F, A, phi, sr, t, convolution = None):
     data = np.abs(wave * convolution[:, np.newaxis]) # We take the absolute value of the final signal
     data *= A
     return data
+
+
+def generate_non_stationary(A:float, b:float, t0:float, t:np.array, w_k:float, phi:float):
+
+
+    signal = np.heaviside(t-t0, 0)*A*np.exp(-b*t)*np.sin(w_k*t + phi)
+
+    return signal

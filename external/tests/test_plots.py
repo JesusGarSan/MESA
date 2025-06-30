@@ -1,7 +1,7 @@
-from src.simulation import generator
-from src.feature_extraction import features 
-from src.feature_extraction.energy_check import get_bins
-from src.visualization import plot
+from src.msa.simulation import generator
+from src.msa.feature_extraction import features 
+from src.msa.feature_extraction.energy_check import get_bins
+from src.msa.visualization import plot
 
 import numpy as np
 
@@ -61,3 +61,20 @@ def test_plot_spectrogram():
     fig, ax, _ =plot.spectrogram(time, freq, Sxx)
     fig.savefig(path+"/spectrogram.png")
     assert os.path.exists(path+"spectrogram.png")
+
+
+def test_non_stationary():
+
+    t0=5
+    t = np.linspace(0, 25, 1000)
+    A = 10.2
+    b = .3
+    w_k = 2*np.pi / 10
+    phi = 5
+
+    signal = generator.generate_non_stationary(A,b,t0,t,w_k,phi)
+    fig,ax = plot.signal(t, signal)
+    fig.savefig(path+"/non_stationary.png")
+
+
+    return

@@ -1,8 +1,8 @@
-from src.feature_extraction import energy_check
-from src.simulation import generator
-from src.feature_extraction import features 
-from src.feature_extraction.energy_check import get_bins
-from src.visualization import plot
+from src.msa.feature_extraction import energy_check
+from src.msa.simulation import generator
+from src.msa.feature_extraction import features 
+from src.msa.feature_extraction.energy_check import get_bins
+from src.msa.visualization import plot
 
 import numpy as np
 import os
