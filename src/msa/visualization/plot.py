@@ -64,7 +64,7 @@ def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, sho
     """
     if ax is None:
         fig, ax = plt.subplots()
-        fig.suptitle("Raw signal")
+        # fig.suptitle("Raw signal")
         fig.supxlabel("Time (s)")
         fig.supylabel("Frequency (Hz)")
     else: fig = None

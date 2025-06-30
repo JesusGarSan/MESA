@@ -65,16 +65,28 @@ def test_plot_spectrogram():
 
 def test_non_stationary():
 
-    t0=5
-    t = np.linspace(0, 25, 1000)
-    A = 10.2
-    b = .3
-    w_k = 2*np.pi / 10
-    phi = 5
+    sr = 50
+    T = 8
+
+    t0=3
+    t = np.linspace(0, T, int(T*sr))
+    A = 11.2
+    b = 1.7
+    w_k = 2*np.pi * 6.1
+    phi = .0
 
     signal = generator.generate_non_stationary(A,b,t0,t,w_k,phi)
     fig,ax = plot.signal(t, signal)
-    fig.savefig(path+"/non_stationary.png")
+    fig.savefig(path+"/non_stationary_signal.png")
+
+
+
+    win_length = .5 #s
+    win_samples = int(win_length*sr)
+    time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
+    fig, ax, _ =plot.spectrogram(time, freq, Sxx,logscale=False)
+    fig.suptitle(f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
+    fig.savefig(path+"/non_stationary_spectrogram.png")
 
 
     return
