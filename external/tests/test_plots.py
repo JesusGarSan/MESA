@@ -63,7 +63,7 @@ def test_plot_spectrogram():
     assert os.path.exists(path+"spectrogram.png")
 
 
-def test_non_stationary():
+def test_pulse():
 
     sr = 50
     T = 8
@@ -75,18 +75,68 @@ def test_non_stationary():
     w_k = 2*np.pi * 6.1
     phi = .0
 
-    signal = generator.generate_non_stationary(A,b,t0,t,w_k,phi)
+    signal = generator.generate_pulse(A,b,t0,t,w_k,phi)
     fig,ax = plot.signal(t, signal)
-    fig.savefig(path+"/non_stationary_signal.png")
-
+    fig.savefig(path+"/pulse_signal.png")
 
 
     win_length = .5 #s
     win_samples = int(win_length*sr)
+
+    time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
+    fig, ax, _ =plot.spectrogram(time, freq, Sxx,logscale=False)
+    fig.suptitle(f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
+    fig.savefig(path+"/pulse_spectrogram.png")
+
+
+    return
+
+def test_non_stationary():
+
+    A = 11.2
+    f0, f_max = 2, 15
+    sr = 100
+    T = 10
+    t = np.linspace(0, T, int(sr*T))
+    phi = 0.0
+    M = 0.1
+
+    signal = generator.generate_non_stationary(A, f0, f_max, sr, T, phi)
+    fig,ax = plot.signal(t, signal)
+    fig.suptitle(f"Max f: {f_max} Hz")
+    fig.savefig(path+"/non_stationary_signal.png")
+
+
+
+    win_length = 1 #s
+    win_samples = int(win_length*sr)
+
     time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
     fig, ax, _ =plot.spectrogram(time, freq, Sxx,logscale=False)
     fig.suptitle(f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
     fig.savefig(path+"/non_stationary_spectrogram.png")
+
+    return
+
+
+def test_undefined_sin():
+    sr = 1000
+    T = 0.5
+    t0 = 0.01
+    t = np.linspace(t0,T, sr)
+    signal = generator.generate_undefined_sin(t, b = 0)
+
+    fig,ax = plot.signal(t, signal)
+    fig.suptitle(f"sin(1/x)")
+    fig.savefig(path+"/undefined_sin_signal.png")
+
+    win_length = 0.01 #s
+    win_samples = int(win_length*sr)
+
+    time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
+    fig, ax, _ =plot.spectrogram(time, freq, Sxx,logscale=False)
+    fig.suptitle(f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
+    fig.savefig(path+"/undefined_sin_spectrogram.png")
 
 
     return

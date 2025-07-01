@@ -77,8 +77,20 @@ def ground_truth(F, A, phi, sr, t, convolution = None):
     return data
 
 
-def generate_non_stationary(A:float, b:float, t0:float, t:np.array, w_k:float, phi:float):
+def generate_pulse(A:float, b:float, t0:float, t:np.array, w_k:float, phi:float):
 
     signal = np.heaviside(t-t0, 0)*A*np.exp(-b*t)*np.sin(w_k*t + phi)
 
     return signal
+
+def generate_non_stationary(A:float, f0:float, f_max:float, sr:float, T:int, phi:float):
+
+    t = np.arange(int(T*sr)) / sr
+    k = (f_max - f0) / (t[-1])  
+    phase = 2 * np.pi * (f0 * t + 0.5 * k * t**2) + phi  
+    signal = A * np.sin(phase)
+
+    return signal
+
+def generate_undefined_sin(t:np.array, b:float = 0.0):
+    return np.sin(1/t)*np.exp(-t*b)
