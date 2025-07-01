@@ -80,11 +80,11 @@ def ground_truth(F, A, phi, sr, t, convolution = None):
 def generate_pulse(A:float, b:float, t0:float, t:np.array, w_k:float, phi:float):
 
     signal = np.heaviside(t-t0, 0)*A*np.exp(-b*t)*np.sin(w_k*t + phi)
-    signal = np.heaviside(t-t0, 0)*A*np.exp(-b*t)*np.sin(1/(t-t0) + phi)
+    # signal = np.heaviside(t-t0, 0)*A*np.exp(-b*t)*np.sin(1/(t-t0) + phi)
 
     return signal
 
-def generate_non_stationary(A:float, f0:float, f_max:float, sr:float, T:int, phi:float):
+def chirp(A:float, f0:float, f_max:float, sr:float, T:int, phi:float):
 
     t = np.arange(int(T*sr)) / sr
     k = (f_max - f0) / (t[-1])  

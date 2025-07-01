@@ -83,10 +83,10 @@ def test_pulse():
     _,ax[0] = plot.signal(t, signal, ax=ax[0])
 
 
-    win_length = .1 #s 1/T
+    win_length = .1 #s 
     win_samples = int(win_length*sr)
 
-    time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"hann", "odd", t_phase =win_length/2)
+    time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
     _, ax[1], mesh =plot.spectrogram(time, freq, Sxx,logscale=False, ax=ax[1])
     
     
@@ -106,7 +106,7 @@ def test_pulse():
 
     return
 
-def test_non_stationary():
+def test_chirp():
 
     A = 11.2
     f0, f_max = 2, 15
@@ -117,15 +117,15 @@ def test_non_stationary():
 
     fig, ax = plt.subplots(2,1, figsize=(10,4))
 
-    signal = generator.generate_non_stationary(A, f0, f_max, sr, T, phi)
+    signal = generator.chirp(A, f0, f_max, sr, T, phi)
     _,ax[0] = plot.signal(t, signal, ax = ax[0])
 
 
 
-    win_length = .1 #s
+    win_length = .5 #s
     win_samples = int(win_length*sr)
 
-    time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"hann", "odd", t_phase =win_length/2)
+    time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
     _, ax[1], mesh =plot.spectrogram(time, freq, Sxx,logscale=False, ax = ax[1],ylim=(0,20))
     
     fig.suptitle("Non stationary signal\n" + f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
@@ -138,14 +138,14 @@ def test_non_stationary():
     cbar_ax = fig.add_axes([0.87, bbox.y0, 0.01, bbox.height])
     cbar = fig.colorbar(mesh, cax=cbar_ax)
 
-    fig.savefig(path+"/non_stationary.png")
+    fig.savefig(path+"/chirp.png")
 
     return
 
 
 def test_undefined_sin():
-    sr = 5000
-    T = 0.5
+    sr = 1000
+    T = 0.2
     t0 = 0.01
     t = np.linspace(t0,T, sr)
 
@@ -155,11 +155,11 @@ def test_undefined_sin():
 
     _,ax[0] = plot.signal(t, signal, ax = ax[0])
 
-    win_length = 0.01 #s
+    win_length = 0.02 #s
     win_samples = int(win_length*sr)
 
     time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
-    _, ax[1], mesh =plot.spectrogram(time, freq, Sxx,logscale=False, ax = ax[1])
+    _, ax[1], mesh =plot.spectrogram(time, freq, Sxx,logscale=False, ax = ax[1], ylim=(0,200))
 
     fig.suptitle("sin(1/x)\n" + f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
     ax[0].set_ylabel("Amplitude", )
