@@ -45,7 +45,7 @@ def fft(fft_freq, fft, mode = 'module'):
     return fig
 
 
-def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, show:bool = False, vmin:float=None, vmax:float=None, logscale=False, ax = None):
+def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, ylim:tuple=None, show:bool = False, vmin:float=None, vmax:float=None, logscale=False, ax = None):
     """
     Plots a spectrogram
 
@@ -77,6 +77,8 @@ def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, sho
 
     if xlim is not None:
         plt.xlim(xlim[0], xlim[1])
+    if ylim is not None:
+        plt.ylim(ylim[0], ylim[1])
     mesh.set_clim(vmin,vmax)
 
     if fig is not None:

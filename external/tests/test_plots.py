@@ -67,10 +67,10 @@ def test_plot_spectrogram():
 
 def test_pulse():
 
-    sr = 50
-    T = 8
+    sr = 200
+    T = 4
 
-    t0=3
+    t0=1
     t = np.linspace(0, T, int(T*sr))
     A = 11.2
     b = 1.7
@@ -83,10 +83,10 @@ def test_pulse():
     _,ax[0] = plot.signal(t, signal, ax=ax[0])
 
 
-    win_length = .5 #s
+    win_length = .1 #s 1/T
     win_samples = int(win_length*sr)
 
-    time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
+    time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"hann", "odd", t_phase =win_length/2)
     _, ax[1], mesh =plot.spectrogram(time, freq, Sxx,logscale=False, ax=ax[1])
     
     
@@ -110,7 +110,7 @@ def test_non_stationary():
 
     A = 11.2
     f0, f_max = 2, 15
-    sr = 100
+    sr = 1000
     T = 10
     t = np.linspace(0, T, int(sr*T))
     phi = 0.0
@@ -122,11 +122,11 @@ def test_non_stationary():
 
 
 
-    win_length = 1 #s
+    win_length = .1 #s
     win_samples = int(win_length*sr)
 
-    time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
-    _, ax[1], mesh =plot.spectrogram(time, freq, Sxx,logscale=False, ax = ax[1])
+    time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"hann", "odd", t_phase =win_length/2)
+    _, ax[1], mesh =plot.spectrogram(time, freq, Sxx,logscale=False, ax = ax[1],ylim=(0,20))
     
     fig.suptitle("Non stationary signal\n" + f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
     ax[0].set_ylabel("Amplitude", )
