@@ -60,7 +60,7 @@ def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, sho
         logscale (bool, optional): If True, applies a logarithmic color scale. Defaults to False.
 
     Returns:
-        tuple: (fig, ax) - The figure and axes objects.
+        tuple: (fig, ax, mesh) - The figure and axes objects.
     """
     if ax is None:
         fig, ax = plt.subplots()

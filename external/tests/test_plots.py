@@ -4,6 +4,8 @@ from src.msa.feature_extraction.energy_check import get_bins
 from src.msa.visualization import plot
 
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 import os
 path = "external/tests/plots/"
@@ -75,18 +77,31 @@ def test_pulse():
     w_k = 2*np.pi * 6.1
     phi = .0
 
+    fig, ax = plt.subplots(2,1, figsize=(10,4))
+
     signal = generator.generate_pulse(A,b,t0,t,w_k,phi)
-    fig,ax = plot.signal(t, signal)
-    fig.savefig(path+"/pulse_signal.png")
+    _,ax[0] = plot.signal(t, signal, ax=ax[0])
 
 
     win_length = .5 #s
     win_samples = int(win_length*sr)
 
     time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
-    fig, ax, _ =plot.spectrogram(time, freq, Sxx,logscale=False)
-    fig.suptitle(f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
-    fig.savefig(path+"/pulse_spectrogram.png")
+    _, ax[1], mesh =plot.spectrogram(time, freq, Sxx,logscale=False, ax=ax[1])
+    
+    
+    
+    fig.suptitle("Pulse with exponential decay\n" + f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
+    ax[0].set_ylabel("Amplitude", )
+    ax[1].set_ylabel("Frequency \n(Hz)", )
+    ax[1].set_xlabel("Time (s)", )
+    fig.subplots_adjust(right=0.86)
+    tbox = ax[0].get_position()
+    bbox = ax[1].get_position()
+    cbar_ax = fig.add_axes([0.87, bbox.y0, 0.01, bbox.height])
+    cbar = fig.colorbar(mesh, cax=cbar_ax)
+
+    fig.savefig(path+"/pulse.png")
 
 
     return
@@ -99,12 +114,11 @@ def test_non_stationary():
     T = 10
     t = np.linspace(0, T, int(sr*T))
     phi = 0.0
-    M = 0.1
+
+    fig, ax = plt.subplots(2,1, figsize=(10,4))
 
     signal = generator.generate_non_stationary(A, f0, f_max, sr, T, phi)
-    fig,ax = plot.signal(t, signal)
-    fig.suptitle(f"Max f: {f_max} Hz")
-    fig.savefig(path+"/non_stationary_signal.png")
+    _,ax[0] = plot.signal(t, signal, ax = ax[0])
 
 
 
@@ -112,31 +126,53 @@ def test_non_stationary():
     win_samples = int(win_length*sr)
 
     time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
-    fig, ax, _ =plot.spectrogram(time, freq, Sxx,logscale=False)
-    fig.suptitle(f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
-    fig.savefig(path+"/non_stationary_spectrogram.png")
+    _, ax[1], mesh =plot.spectrogram(time, freq, Sxx,logscale=False, ax = ax[1])
+    
+    fig.suptitle("Non stationary signal\n" + f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
+    ax[0].set_ylabel("Amplitude", )
+    ax[1].set_ylabel("Frequency \n(Hz)", )
+    ax[1].set_xlabel("Time (s)", )
+    fig.subplots_adjust(right=0.86)
+    tbox = ax[0].get_position()
+    bbox = ax[1].get_position()
+    cbar_ax = fig.add_axes([0.87, bbox.y0, 0.01, bbox.height])
+    cbar = fig.colorbar(mesh, cax=cbar_ax)
+
+    fig.savefig(path+"/non_stationary.png")
 
     return
 
 
 def test_undefined_sin():
-    sr = 1000
+    sr = 5000
     T = 0.5
     t0 = 0.01
     t = np.linspace(t0,T, sr)
+
+    fig, ax = plt.subplots(2,1, figsize=(10,4))
+
     signal = generator.generate_undefined_sin(t, b = 0)
 
-    fig,ax = plot.signal(t, signal)
-    fig.suptitle(f"sin(1/x)")
-    fig.savefig(path+"/undefined_sin_signal.png")
+    _,ax[0] = plot.signal(t, signal, ax = ax[0])
 
     win_length = 0.01 #s
     win_samples = int(win_length*sr)
 
     time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
-    fig, ax, _ =plot.spectrogram(time, freq, Sxx,logscale=False)
-    fig.suptitle(f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
-    fig.savefig(path+"/undefined_sin_spectrogram.png")
+    _, ax[1], mesh =plot.spectrogram(time, freq, Sxx,logscale=False, ax = ax[1])
+
+    fig.suptitle("sin(1/x)\n" + f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
+    ax[0].set_ylabel("Amplitude", )
+    ax[1].set_ylabel("Frequency \n(Hz)", )
+    ax[1].set_xlabel("Time (s)", )
+    fig.subplots_adjust(right=0.86)
+    tbox = ax[0].get_position()
+    bbox = ax[1].get_position()
+    cbar_ax = fig.add_axes([0.87, bbox.y0, 0.01, bbox.height])
+    cbar = fig.colorbar(mesh, cax=cbar_ax)
+
+    fig.savefig(path+"/undefined_sin.png")
+
 
 
     return
