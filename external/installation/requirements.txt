@@ -3,3 +3,5 @@ numpy
 scipy
 obspy
 scikit-learn
+git+https://github.com/CoDaSLab/MSPC_PCA-based.git#egg=mspc-pca
+

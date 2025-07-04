@@ -84,7 +84,7 @@ def generate_pulse(A:float, b:float, t0:float, t:np.array, w_k:float, phi:float)
 
     return signal
 
-def chirp(A:float, f0:float, f_max:float, sr:float, T:int, phi:float):
+def generate_chirp(A:float, f0:float, f_max:float, sr:float, T:float, phi:float):
 
     t = np.arange(int(T*sr)) / sr
     k = (f_max - f0) / (t[-1])  
