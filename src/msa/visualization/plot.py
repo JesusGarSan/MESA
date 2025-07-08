@@ -76,9 +76,9 @@ def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, yli
         mesh = ax.pcolormesh(t, f, Sxx, vmin=vmin, vmax=vmax) # default linear scale
 
     if xlim is not None:
-        plt.xlim(xlim[0], xlim[1])
+        ax.set_xlim(xlim[0], xlim[1])
     if ylim is not None:
-        plt.ylim(ylim[0], ylim[1])
+        ax.set_ylim(ylim[0], ylim[1])
     mesh.set_clim(vmin,vmax)
 
     if fig is not None:

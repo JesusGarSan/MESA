@@ -1,6 +1,7 @@
 import numpy as np
+import scipy
 
-def generate_signal(freq:float, A:float, sr = 100.0, t = 1.0, phi:float=0, verbose = False):
+def signal(freq:float, A:float, sr = 100.0, t = 1.0, phi:float=0, verbose = False):
     """
         freq = [2.] #Hz. frequencies of the signal
         A    = [1.] # Amplitudes of the signal's frequencies
@@ -33,7 +34,7 @@ def generate_signal(freq:float, A:float, sr = 100.0, t = 1.0, phi:float=0, verbo
 
     return x, y 
 
-def generate_frequencies(N, f0 = None, sigma = 0.1, sr:float = 100.0, mode = 'random'):
+def frequencies(N:int, f0 = None, sigma = 0.1, sr:float = 100.0, mode = 'random'):
     if f0 is None:
         f_Ny = sr/2; # Won't generate frequencies higher than what's observable via Nyquist
         f0 = [np.random.rand(N) * f_Ny] # Central frequency
@@ -50,7 +51,7 @@ def generate_frequencies(N, f0 = None, sigma = 0.1, sr:float = 100.0, mode = 'ra
     return frequencies
 
     
-def generate_amplitudes(N, center=100, sigma = 1, mode = 'random'):
+def amplitudes(N:int, center:float=100.0, sigma:float = 1.0, mode = 'random'):
     # N: Number of amplitudes to generate
     # center: Value aorund which amplitudes are centered
     center = center if hasattr(center, '__iter__') else [center]
@@ -61,14 +62,14 @@ def generate_amplitudes(N, center=100, sigma = 1, mode = 'random'):
             A[N*i:N*(i+1)] = np.random.normal(loc = A0, scale = sigma, size = N) # loc: Mean, scale = standard deviation
     return A
 
-def generate_phase(N):
+def phase(N):
     phi = np.random.rand(N)*np.pi*2
     return phi
 
 
 def ground_truth(F, A, phi, sr, t, convolution = None):
     """ WIP """
-    x, y = generate_signal(F, A, sr, t, phi=phi);
+    x, y = signal(F, A, sr, t, phi=phi);
 
     wave = np.sin(np.outer(x, np.pi*2*F)+phi)
     if convolution is None: convolution = np.ones(len(wave))
@@ -77,21 +78,23 @@ def ground_truth(F, A, phi, sr, t, convolution = None):
     return data
 
 
-def generate_pulse(A:float, b:float, t0:float, t:np.array, w_k:float, phi:float):
+def pulse(A:float, b:float, t0:float, t:np.array, f0:float, phi:float):
 
-    signal = np.heaviside(t-t0, 0)*A*np.exp(-b*t)*np.sin(w_k*t + phi)
+    signal = np.heaviside(t-t0, 0)*A*np.exp(-b*(t-t0))*np.sin(2*np.pi*f0*(t-t0) + phi)
     # signal = np.heaviside(t-t0, 0)*A*np.exp(-b*t)*np.sin(1/(t-t0) + phi)
 
     return signal
 
-def generate_chirp(A:float, f0:float, f_max:float, sr:float, T:float, phi:float):
 
-    t = np.arange(int(T*sr)) / sr
-    k = (f_max - f0) / (t[-1])  
-    phase = 2 * np.pi * (f0 * t + 0.5 * k * t**2) + phi  
-    signal = A * np.sin(phase)
+def chirp(t:np.array, A:float, f0:float, f1:float,
+          t0:float, t1:float, method:str, phi:float, t_end:float=None, **kwargs):
+    if t_end == None: t_end = t[-1]
+    signal = np.heaviside(t-t0,0)*scipy.signal.chirp(t, f0, t1, f1, method, phi,**kwargs)*np.heaviside(t_end-t,0)
+    return A*signal
 
-    return signal
+def decay(t:np.array, b:float, t0:float):
+    convolution = np.heaviside(t-t0, 0)*np.exp(-b*(t-t0))
+    return convolution
 
-def generate_undefined_sin(t:np.array, b:float = 0.0):
-    return np.sin(1/t)*np.exp(-t*b)
+def chirp_sin(t:np.array, b:float = 0.0, t0:float=0.0):
+    return np.heaviside(t-t0, 0)*np.sin(1/(t-t0))*np.exp(-(t-t0)*b)

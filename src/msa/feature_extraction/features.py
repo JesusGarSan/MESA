@@ -68,9 +68,11 @@ def load(filepath):
         return None, None
 
 
-def stft       (signal, sr, win_samples, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = 0, **kwargs):
+def stft       (signal, sr, win_samples, hop=None,  window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = 0, **kwargs):
+    if hop is None:
+        hop = win_samples
     win = get_window(window, win_samples)
-    SFT = ShortTimeFFT(win,win_samples,sr, mfft=n_bins)
+    SFT = ShortTimeFFT(win,hop,sr, mfft=n_bins)
 
     time = SFT.t(len(signal)) + t_phase
     freq = SFT.f
@@ -78,9 +80,11 @@ def stft       (signal, sr, win_samples, window = "boxcar", padding="odd", detre
 
     return time, freq, Zxx
 
-def spectrogram(signal, sr, win_samples, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = 0, **kwargs):
+def spectrogram(signal, sr, win_samples, hop=None, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = 0, **kwargs):
+    if hop is None:
+        hop = win_samples
     win = get_window(window, win_samples)
-    SFT = ShortTimeFFT(win,win_samples,sr, mfft=n_bins)
+    SFT = ShortTimeFFT(win,hop,sr, mfft=n_bins)
 
     time = SFT.t(len(signal)) + t_phase
     freq = SFT.f

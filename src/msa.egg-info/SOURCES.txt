@@ -11,5 +11,5 @@ src/msa/feature_extraction/energy_check.py
 src/msa/feature_extraction/features.py
 src/msa/meda/meda.py
 src/msa/simulation/__init__.py
-src/msa/simulation/generator.py
+src/msa/simulation/generate.py
 src/msa/visualization/plot.py

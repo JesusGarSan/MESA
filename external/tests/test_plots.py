@@ -1,4 +1,4 @@
-from src.msa.simulation import generator
+from msa.simulation import generate
 from src.msa.feature_extraction import features 
 from src.msa.feature_extraction.energy_check import get_bins
 from src.msa.visualization import plot
@@ -18,11 +18,11 @@ N, sr, t = 10, 100, 2
 f0 = [5., 15., 25.]
 A0 = [10, 20, 15]
 
-F = generator.generate_frequencies(N, sigma=0.0, f0=f0)
-A = generator.generate_amplitudes(N, A0,sigma=0.)
-phi = generator.generate_phase(N*len(f0))
+F = generate.generate_frequencies(N, sigma=0.0, f0=f0)
+A = generate.generate_amplitudes(N, A0,sigma=0.)
+phi = generate.generate_phase(N*len(f0))
 
-x, y = generator.generate_signal(F, A, sr, t, phi)
+x, y = generate.generate_signal(F, A, sr, t, phi)
 
 def test_plot_signal():
     fig, ax = plot.signal(x,y)
@@ -47,10 +47,10 @@ def test_plot_spectrogram():
     N, sr, t = 10, 100, 3
     f0 = [5., 15., 25.]
     A0 = [10, 20, 15]
-    F = generator.generate_frequencies(N, sigma=0.0, f0=f0)
-    A = generator.generate_amplitudes(N, A0,sigma=0.0)
+    F = generate.generate_frequencies(N, sigma=0.0, f0=f0)
+    A = generate.generate_amplitudes(N, A0,sigma=0.0)
     phi=0
-    x, y = generator.generate_signal(F, A, sr, t, phi)
+    x, y = generate.generate_signal(F, A, sr, t, phi)
 
     x_aux = x - t/2 # Peak on the middle of the signal
     convolution = 1* np.exp(-(x_aux/10)**2)
@@ -79,7 +79,7 @@ def test_pulse():
 
     fig, ax = plt.subplots(2,1, figsize=(10,4))
 
-    signal = generator.generate_pulse(A,b,t0,t,w_k,phi)
+    signal = generate.generate_pulse(A,b,t0,t,w_k,phi)
     _,ax[0] = plot.signal(t, signal, ax=ax[0])
 
 
@@ -117,7 +117,7 @@ def test_chirp():
 
     fig, ax = plt.subplots(2,1, figsize=(10,4))
 
-    signal = generator.chirp(A, f0, f_max, sr, T, phi)
+    signal = generate.chirp(A, f0, f_max, sr, T, phi)
     _,ax[0] = plot.signal(t, signal, ax = ax[0])
 
 
@@ -151,7 +151,7 @@ def test_undefined_sin():
 
     fig, ax = plt.subplots(2,1, figsize=(10,4))
 
-    signal = generator.generate_undefined_sin(t, b = 0)
+    signal = generate.generate_undefined_sin(t, b = 0)
 
     _,ax[0] = plot.signal(t, signal, ax = ax[0])
 

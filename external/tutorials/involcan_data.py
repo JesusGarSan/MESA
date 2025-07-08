@@ -90,6 +90,8 @@ n_channels = len(st)
 sr = st[0].stats.sampling_rate # We are assuming that all traces have the same sr
 window_length = 3600.0     # s. Length of the windows in seconds
 window_samples = int(window_length*sr)
+shift = window_length
+hop = int(sr*shift)
 shift  = window_length/2  # s. Length of the window shift in seconds
 n_bins = int(window_samples);  # Number of bins to use for the STFT calculation
 
@@ -114,7 +116,7 @@ endtime = st[-1].stats.endtime.datetime
 
 for i in range(n_channels):
     print(f"Computing for trace {i}...")
-    time, freq, Sx = features.stft(st[i].data, sr, window_samples, "hann", "odd",
+    time, freq, Sx = features.stft(st[i].data, sr, window_samples,hop, "hann", "odd",
                                    detrend,n_bins, t_phase=window_length/2)
     times_stft[i,:] = time[:-1]
     freqs_stft[i,:] = freq[:-1]
