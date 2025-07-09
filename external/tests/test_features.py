@@ -13,11 +13,11 @@ N, sr, t = 10, 100, 2
 f0 = [5., 15., 25.]
 A0 = [10, 20, 15]
 
-F = generate.generate_frequencies(N, sigma=0.0, f0=f0)
-A = generate.generate_amplitudes(N, A0,sigma=0.)
+F = generate.frequencies(N, sigma=0.0, f0=f0)
+A = generate.amplitudes(N, A0,sigma=0.)
 phi=0.0
 
-x, y = generate.generate_signal(F, A, sr, t, phi)
+x, y = generate.signal(F, A, sr, t, phi)
 
 def test_fft_bin_energy():
     """ Check energy conservation with correct binning. """
@@ -51,9 +51,9 @@ def test_save():
 
 def test_stft_spectrogram_equivalence():
     N, sr, t = 10, 100, 10
-    F = generate.generate_frequencies(N, sigma=10.0, f0=f0)
-    A = generate.generate_amplitudes(N, A0,sigma=10.)
-    x, y = generate.generate_signal(F, A, sr, t, phi)
+    F = generate.frequencies(N, sigma=10.0, f0=f0)
+    A = generate.amplitudes(N, A0,sigma=10.)
+    x, y = generate.signal(F, A, sr, t, phi)
 
     x_aux = x - t/2 # Peak on the middle of the signal
     convolution = 1* np.exp(-(x_aux/10)**2)

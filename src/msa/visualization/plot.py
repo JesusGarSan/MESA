@@ -45,7 +45,7 @@ def fft(fft_freq, fft, mode = 'module'):
     return fig
 
 
-def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, ylim:tuple=None, show:bool = False, vmin:float=None, vmax:float=None, logscale=False, ax = None):
+def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, ylim:tuple=None, cmap = 'viridis', show:bool = False, vmin:float=None, vmax:float=None, logscale=False, ax = None):
     """
     Plots a spectrogram
 
@@ -71,9 +71,9 @@ def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, yli
 
     if logscale:
         norm = colors.LogNorm(vmin=vmin, vmax=vmax)  # Use LogNorm for logarithmic scaling
-        mesh = ax.pcolormesh(t, f, Sxx, norm=norm)
+        mesh = ax.pcolormesh(t, f, Sxx, norm=norm, cmap=cmap)
     else:
-        mesh = ax.pcolormesh(t, f, Sxx, vmin=vmin, vmax=vmax) # default linear scale
+        mesh = ax.pcolormesh(t, f, Sxx, vmin=vmin, vmax=vmax, cmap=cmap) # default linear scale
 
     if xlim is not None:
         ax.set_xlim(xlim[0], xlim[1])
@@ -87,3 +87,62 @@ def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, yli
     if show: plt.show()
     
     return fig, ax, mesh
+
+
+def grid(n_rows:int, n_columns:int, figsize:tuple=(10,10), axis:bool = True, x0:float=0.05, x1:float=0.95, text0:str = '', text1:str=''):
+
+    fig, ax = plt.subplots(n_rows,n_columns, figsize=figsize, sharex=True, sharey=True)
+
+    ax_aux = fig.add_axes([0, 0, 1, 1], zorder=-1)
+    ax_aux.axis("off")
+
+    ax_aux.annotate('',xytext=(x0,x0), xy=(x0,x1), # start, end (arrow)
+                    arrowprops=dict(arrowstyle='->', linewidth=3, mutation_scale=30, color='darkgreen'))
+    ax_aux.annotate('',xytext=(x0,x0), xy=(x1,x0), # start, end (arrow)
+                    arrowprops=dict(arrowstyle='->', linewidth=3, mutation_scale=30, color='darkgreen'))
+    
+    fig.text((x1+x0)/2, x0/2, text0, ha='center', va='bottom', fontsize=12)    
+    fig.text(x0/2, (x1+x0)/2, text1, ha='center', va='bottom', rotation=90, fontsize=12)  
+
+    # plt.tight_layout()  
+    
+    return fig, ax
+
+
+def spectrogram_grid(ts, fs, Sxxs, nrows, ncols, xlim=None, ylim=None, vmin=None, vmax=None, logscale=False, figsize=(12, 8), show=True):
+    """
+    Plots a grid of spectrograms.
+
+    Args:
+        ts (list): List of time arrays.
+        fs (list): List of frequency arrays.
+        Sxxs (list): List of power spectral densities (2D arrays).
+        nrows (int): Number of rows in the grid.
+        ncols (int): Number of columns in the grid.
+        xlim, ylim, vmin, vmax, logscale: Passed to individual spectrograms.
+        figsize (tuple): Size of the full figure.
+        show (bool): Whether to show the figure.
+    """
+    total_plots = nrows * ncols
+    num_spectrograms = len(Sxxs)
+
+    fig, axes = plt.subplots(nrows, ncols, figsize=figsize, squeeze=False)
+    fig.supxlabel("Time (s)")
+    fig.supylabel("Frequency (Hz)")
+
+    for i in range(total_plots):
+        row, col = divmod(i, ncols)
+        ax = axes[row][col]
+        if i < num_spectrograms:
+            t = ts[i]
+            f = fs[i]
+            Sxx = Sxxs[i]
+            spectrogram(t, f, Sxx, xlim=xlim, ylim=ylim, vmin=vmin, vmax=vmax, logscale=logscale, ax=ax)
+        else:
+            ax.axis('off')  # Hide unused subplots
+
+    plt.tight_layout()
+    if show:
+        plt.show()
+
+    return fig, axes

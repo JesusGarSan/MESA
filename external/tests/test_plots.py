@@ -18,11 +18,11 @@ N, sr, t = 10, 100, 2
 f0 = [5., 15., 25.]
 A0 = [10, 20, 15]
 
-F = generate.generate_frequencies(N, sigma=0.0, f0=f0)
-A = generate.generate_amplitudes(N, A0,sigma=0.)
-phi = generate.generate_phase(N*len(f0))
+F = generate.frequencies(N, sigma=0.0, f0=f0)
+A = generate.amplitudes(N, A0,sigma=0.)
+phi = generate.phase(N*len(f0))
 
-x, y = generate.generate_signal(F, A, sr, t, phi)
+x, y = generate.signal(F, A, sr, t, phi)
 
 def test_plot_signal():
     fig, ax = plot.signal(x,y)
@@ -47,10 +47,10 @@ def test_plot_spectrogram():
     N, sr, t = 10, 100, 3
     f0 = [5., 15., 25.]
     A0 = [10, 20, 15]
-    F = generate.generate_frequencies(N, sigma=0.0, f0=f0)
-    A = generate.generate_amplitudes(N, A0,sigma=0.0)
+    F = generate.frequencies(N, sigma=0.0, f0=f0)
+    A = generate.amplitudes(N, A0,sigma=0.0)
     phi=0
-    x, y = generate.generate_signal(F, A, sr, t, phi)
+    x, y = generate.signal(F, A, sr, t, phi)
 
     x_aux = x - t/2 # Peak on the middle of the signal
     convolution = 1* np.exp(-(x_aux/10)**2)
@@ -79,7 +79,7 @@ def test_pulse():
 
     fig, ax = plt.subplots(2,1, figsize=(10,4))
 
-    signal = generate.generate_pulse(A,b,t0,t,w_k,phi)
+    signal = generate.pulse(A,b,t0,t,w_k,phi)
     _,ax[0] = plot.signal(t, signal, ax=ax[0])
 
 
@@ -91,7 +91,7 @@ def test_pulse():
     
     
     
-    fig.suptitle("Pulse with exponential decay\n" + f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
+    fig.suptitle("Pulse with exponential decay\n" + fr"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
     ax[0].set_ylabel("Amplitude", )
     ax[1].set_ylabel("Frequency \n(Hz)", )
     ax[1].set_xlabel("Time (s)", )
@@ -128,7 +128,7 @@ def test_chirp():
     time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
     _, ax[1], mesh =plot.spectrogram(time, freq, Sxx,logscale=False, ax = ax[1],ylim=(0,20))
     
-    fig.suptitle("Non stationary signal\n" + f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
+    fig.suptitle("Non stationary signal\n" + fr"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
     ax[0].set_ylabel("Amplitude", )
     ax[1].set_ylabel("Frequency \n(Hz)", )
     ax[1].set_xlabel("Time (s)", )
@@ -151,7 +151,7 @@ def test_undefined_sin():
 
     fig, ax = plt.subplots(2,1, figsize=(10,4))
 
-    signal = generate.generate_undefined_sin(t, b = 0)
+    signal = generate.chirp_sin(t, b = 0)
 
     _,ax[0] = plot.signal(t, signal, ax = ax[0])
 
@@ -161,7 +161,7 @@ def test_undefined_sin():
     time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
     _, ax[1], mesh =plot.spectrogram(time, freq, Sxx,logscale=False, ax = ax[1], ylim=(0,200))
 
-    fig.suptitle("sin(1/x)\n" + f"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
+    fig.suptitle("sin(1/x)\n" + fr"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
     ax[0].set_ylabel("Amplitude", )
     ax[1].set_ylabel("Frequency \n(Hz)", )
     ax[1].set_xlabel("Time (s)", )
@@ -175,4 +175,37 @@ def test_undefined_sin():
 
 
 
+    return
+
+def test_spectrogram_grid():
+
+    signal = np.random.rand(6000)
+    sr=100
+    T = 60
+    t = np.linspace(0, T, int(sr*T))
+
+    N, M = 2,3
+    
+    Sxxs=[]
+    times = []
+    freqs=[]
+
+    windows = [1,3,6,10]
+    shift_fractions = [1/1, 1/3, 1/5, 1/10]
+
+    for window in windows:
+        for shift_fraction in shift_fractions:
+            win_samples = int(sr*window)
+            hop = int(win_samples*shift_fraction)
+            time, freq, Sxx = features.spectrogram(signal, sr, win_samples, hop, "boxcar","odd", "linear")
+            times.append(time)
+            freqs.append(freq)
+            Sxxs.append(Sxx)
+
+    fig, ax = plot.grid(N, M, text0="Horixontql")
+    for n in range(N):
+        for m in range(M):
+            plot.spectrogram(times[n+m], freqs[n+m], Sxxs[n+m], ax=ax[n,m])
+
+    plt.show()
     return

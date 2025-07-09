@@ -89,12 +89,22 @@ def pulse(A:float, b:float, t0:float, t:np.array, f0:float, phi:float):
 def chirp(t:np.array, A:float, f0:float, f1:float,
           t0:float, t1:float, method:str, phi:float, t_end:float=None, **kwargs):
     if t_end == None: t_end = t[-1]
-    signal = np.heaviside(t-t0,0)*scipy.signal.chirp(t, f0, t1, f1, method, phi,**kwargs)*np.heaviside(t_end-t,0)
+    mask = (t >= t0)
+    signal = np.zeros_like(t)
+    signal[mask] = np.heaviside(t[mask]-t0,0)*scipy.signal.chirp(t[mask]-t0, f0, t1-t0, f1, method, phi,**kwargs)*np.heaviside(t_end-t[mask],0)
     return A*signal
 
 def decay(t:np.array, b:float, t0:float):
     convolution = np.heaviside(t-t0, 0)*np.exp(-b*(t-t0))
     return convolution
+
+def grow(t: np.array, b: float, t0: float, duration: float):
+    """
+    Growth function: ramps up from t0 to t0+duration, then cuts off.
+    """
+    growth = np.heaviside(t - t0, 0) * (1 - np.exp(-b * (t - t0)))
+    cutoff = np.heaviside(t0 + duration - t, 1)  # 1 before cutoff, 0 after
+    return growth * cutoff
 
 def chirp_sin(t:np.array, b:float = 0.0, t0:float=0.0):
     return np.heaviside(t-t0, 0)*np.sin(1/(t-t0))*np.exp(-(t-t0)*b)
