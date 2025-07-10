@@ -93,20 +93,20 @@ def grid(n_rows:int, n_columns:int, figsize:tuple=(10,10), axis:bool = True, x0:
 
     fig, ax = plt.subplots(n_rows,n_columns, figsize=figsize, sharex=True, sharey=True)
 
-    ax_aux = fig.add_axes([0, 0, 1, 1], zorder=-1)
-    ax_aux.axis("off")
+    # ax_aux = fig.add_axes([0, 0, 1, 1], zorder=-1)
+    # ax_aux.axis("off")
 
-    ax_aux.annotate('',xytext=(x0,x0), xy=(x0,x1), # start, end (arrow)
-                    arrowprops=dict(arrowstyle='->', linewidth=3, mutation_scale=30, color='darkgreen'))
-    ax_aux.annotate('',xytext=(x0,x0), xy=(x1,x0), # start, end (arrow)
-                    arrowprops=dict(arrowstyle='->', linewidth=3, mutation_scale=30, color='darkgreen'))
+    # ax_aux.annotate('',xytext=(x0,x0), xy=(x0,x1-0.05), # start, end (arrow)
+    #                 arrowprops=dict(arrowstyle='->', linewidth=3, mutation_scale=30, color='darkgreen'))
+    # ax_aux.annotate('',xytext=(x0,x0), xy=(x1,x0), # start, end (arrow)
+    #                 arrowprops=dict(arrowstyle='->', linewidth=3, mutation_scale=30, color='darkred'))
     
-    fig.text((x1+x0)/2, x0/2, text0, ha='center', va='bottom', fontsize=12)    
-    fig.text(x0/2, (x1+x0)/2, text1, ha='center', va='bottom', rotation=90, fontsize=12)  
+    # fig.text((x1+x0)/2, x0, text0, ha='center', va='bottom', fontsize=25)    
+    # fig.text(x0, (x1-x0)/2, text1, ha='center', va='bottom', rotation=90, fontsize=25)  
 
     # plt.tight_layout()  
     
-    return fig, ax
+    return fig, ax, None
 
 
 def spectrogram_grid(ts, fs, Sxxs, nrows, ncols, xlim=None, ylim=None, vmin=None, vmax=None, logscale=False, figsize=(12, 8), show=True):

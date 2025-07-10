@@ -117,7 +117,7 @@ def test_chirp():
 
     fig, ax = plt.subplots(2,1, figsize=(10,4))
 
-    signal = generate.chirp(A, f0, f_max, sr, T, phi)
+    signal = generate.chirp(t, 1, 1, 5, 2, 8, 'linear', 0, 8)
     _,ax[0] = plot.signal(t, signal, ax = ax[0])
 
 
@@ -125,10 +125,10 @@ def test_chirp():
     win_length = .5 #s
     win_samples = int(win_length*sr)
 
-    time, freq, Sxx = features.spectrogram(signal, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
+    time, freq, Sxx = features.spectrogram(signal, sr, win_samples, win_samples,"boxcar", "odd", t_phase =win_length/2)
     _, ax[1], mesh =plot.spectrogram(time, freq, Sxx,logscale=False, ax = ax[1],ylim=(0,20))
     
-    fig.suptitle("Non stationary signal\n" + fr"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
+    fig.suptitle("Chirp\n" + fr"$\Delta f = {1/win_length}$, $\Delta T = {win_length}$")
     ax[0].set_ylabel("Amplitude", )
     ax[1].set_ylabel("Frequency \n(Hz)", )
     ax[1].set_xlabel("Time (s)", )
@@ -139,6 +139,7 @@ def test_chirp():
     cbar = fig.colorbar(mesh, cax=cbar_ax)
 
     fig.savefig(path+"/chirp.png")
+    plt.show()
 
     return
 
@@ -179,7 +180,7 @@ def test_undefined_sin():
 
 def test_spectrogram_grid():
 
-    signal = np.random.rand(6000)
+    signal = np.random.rand(600)
     sr=100
     T = 60
     t = np.linspace(0, T, int(sr*T))
@@ -202,7 +203,7 @@ def test_spectrogram_grid():
             freqs.append(freq)
             Sxxs.append(Sxx)
 
-    fig, ax = plot.grid(N, M, text0="Horixontql")
+    fig, ax = plot.grid(N, M, text0="Horizontal", arrow0=(0.05, .90))
     for n in range(N):
         for m in range(M):
             plot.spectrogram(times[n+m], freqs[n+m], Sxxs[n+m], ax=ax[n,m])
