@@ -68,27 +68,39 @@ def load(filepath):
         return None, None
 
 
-def stft       (signal, sr, win_samples, hop=None,  window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = 0, **kwargs):
+def stft       (signal, sr, win_samples, hop=None, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = None, p0=1, **kwargs):
     if hop is None:
         hop = win_samples
+    if t_phase is None:
+        t_phase = - win_samples//sr / 2
     win = get_window(window, win_samples)
     SFT = ShortTimeFFT(win,hop,sr, mfft=n_bins)
 
-    time = SFT.t(len(signal)) + t_phase
+    # Add half a window at the beginning of the signal to avoid scipy's default
+    # center indexing of windows.
+    signal = np.hstack([np.zeros(win_samples//2), signal])
+
+    time = SFT.t(len(signal), p0=p0, **kwargs) + t_phase
     freq = SFT.f
-    Zxx = SFT.stft_detrend(signal, padding=padding, detr=detrend, **kwargs)
+    Zxx = SFT.stft_detrend(signal, padding=padding, detr=detrend, p0=p0, **kwargs)
 
     return time, freq, Zxx
 
-def spectrogram(signal, sr, win_samples, hop=None, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = 0, **kwargs):
+def spectrogram(signal, sr, win_samples, hop=None, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = None, p0=1, **kwargs):
     if hop is None:
         hop = win_samples
+    if t_phase is None:
+        t_phase = - win_samples//sr / 2
     win = get_window(window, win_samples)
     SFT = ShortTimeFFT(win,hop,sr, mfft=n_bins)
 
-    time = SFT.t(len(signal)) + t_phase
+    # Add half a window at the beginning of the signal to avoid scipy's default
+    # center indexing of windows.
+    signal = np.hstack([np.zeros(win_samples//2), signal])
+
+    time = SFT.t(len(signal), p0=p0, **kwargs) + t_phase
     freq = SFT.f
-    Sxx = SFT.spectrogram(signal, padding=padding, detr=detrend, **kwargs)
+    Sxx = SFT.spectrogram(signal, padding=padding, detr=detrend, p0=p0, **kwargs)
 
     return time, freq, Sxx
 

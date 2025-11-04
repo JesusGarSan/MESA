@@ -62,6 +62,6 @@ def test_stft_spectrogram_equivalence():
     win_length = 1 #s
     win_samples = int(win_length*sr)
 
-    time, freq, Sxx = features.spectrogram(y, sr, win_samples,"boxcar", "odd", t_phase =win_length/2, detrend="constant")
-    time, freq, Zxx = features.stft(y, sr, win_samples,"boxcar", "odd", t_phase =win_length/2, detrend="constant")
+    time, freq, Sxx = features.spectrogram(y, sr, win_samples,None,"boxcar", "odd", t_phase =win_length/2, detrend="constant")
+    time, freq, Zxx = features.stft(y, sr, win_samples,None, "boxcar", "odd", t_phase =win_length/2, detrend="constant")
     assert np.isclose(np.mean(Sxx), np.mean(Zxx.imag**2+Zxx.real**2))

@@ -43,24 +43,23 @@ def test_plot_fft():
 def test_plot_spectrogram():
     path = "external/tests/plots/"
     if not os.path.exists(path): os.makedirs(path)
+    sr = 100
 
-    N, sr, t = 10, 100, 3
-    f0 = [5., 15., 25.]
-    A0 = [10, 20, 15]
-    F = generate.frequencies(N, sigma=0.0, f0=f0)
-    A = generate.amplitudes(N, A0,sigma=0.0)
-    phi=0
-    x, y = generate.signal(F, A, sr, t, phi)
+    t = np.linspace(0, 5, 1000)
+    sr = int(len(t)/(np.max(t)-np.min(t)))
+    print(sr)
+    y = generate.chirp(t,np.max(t),5.0,25.0,
+                       np.min(t),np.max(t),"linear", 0.0)
 
-    x_aux = x - t/2 # Peak on the middle of the signal
-    convolution = 1* np.exp(-(x_aux/10)**2)
-    y*=convolution
+    y *= generate.decay(t, 0.001, 0.0)
 
     win_length = 1 #s
     win_samples = int(win_length*sr)
 
-    time, freq, Sxx = features.spectrogram(y, sr, win_samples,"boxcar", "odd", t_phase =win_length/2)
-    fig, ax, _ =plot.spectrogram(time, freq, Sxx)
+    time, freq, Sxx = features.spectrogram(y, sr, win_samples,None,"boxcar", "odd")
+    time = time[:]
+    Sxx = Sxx[:, :]
+    fig, ax, _ = plot.spectrogram(time, freq, Sxx)
     fig.savefig(path+"/spectrogram.png")
     assert os.path.exists(path+"spectrogram.png")
 
