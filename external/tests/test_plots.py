@@ -56,9 +56,10 @@ def test_plot_spectrogram():
     win_length = 1 #s
     win_samples = int(win_length*sr)
 
-    time, freq, Sxx = features.spectrogram(y, sr, win_samples,None,"boxcar", "odd")
+    time, freq, Sxx = features.spectrogram(y, sr, win_samples,win_samples//2,"blackman", "zeros")
     time = time[:]
     Sxx = Sxx[:, :]
+
     fig, ax, _ = plot.spectrogram(time, freq, Sxx)
     fig.savefig(path+"/spectrogram.png")
     assert os.path.exists(path+"spectrogram.png")

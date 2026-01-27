@@ -67,6 +67,25 @@ def load(filepath):
         print(f"An error occurred while loading the file: {e}")
         return None, None
 
+def get_n_windows(signal, sr, win_samples, hop=None, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = None, p0=1, **kwargs):
+    if hop is None:
+        hop = win_samples
+    if t_phase is None:
+        t_phase = - win_samples//sr / 2
+    win = get_window(window, win_samples)
+    SFT = ShortTimeFFT(win,hop,sr, mfft=n_bins)
+
+    return SFT.p_num(len(signal))
+
+def get_n_frequencies(sr, win_samples, hop=None, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = None, p0=1, **kwargs):
+    if hop is None:
+        hop = win_samples
+    if t_phase is None:
+        t_phase = - win_samples//sr / 2
+    win = get_window(window, win_samples)
+    SFT = ShortTimeFFT(win,hop,sr, mfft=n_bins)
+
+    return SFT.f_pts
 
 def stft       (signal, sr, win_samples, hop=None, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = None, p0=1, **kwargs):
     if hop is None:
