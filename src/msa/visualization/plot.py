@@ -45,7 +45,7 @@ def fft(fft_freq, fft, mode = 'module'):
     return fig
 
 
-def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, ylim:tuple=None, cmap = 'viridis', show:bool = False, vmin:float=None, vmax:float=None, logscale=False, ax = None):
+def spectrogram(t:np.ndarray, f:np.ndarray, Sxx:np.ndarray, xlim:tuple=None, ylim:tuple=None, cmap = 'nipy_spectral', show:bool = False, vmin:float=None, vmax:float=None, logscale=False, ax = None):
     """
     Plots a spectrogram
 
