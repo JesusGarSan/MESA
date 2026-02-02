@@ -67,27 +67,8 @@ def load(filepath):
         print(f"An error occurred while loading the file: {e}")
         return None, None
 
-def get_n_windows(signal, sr, win_samples, hop=None, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = None, p0=1, **kwargs):
-    if hop is None:
-        hop = win_samples
-    if t_phase is None:
-        t_phase = - win_samples//sr / 2
-    win = get_window(window, win_samples)
-    SFT = ShortTimeFFT(win,hop,sr, mfft=n_bins)
 
-    return SFT.p_num(len(signal))
-
-def get_n_frequencies(sr, win_samples, hop=None, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = None, p0=1, **kwargs):
-    if hop is None:
-        hop = win_samples
-    if t_phase is None:
-        t_phase = - win_samples//sr / 2
-    win = get_window(window, win_samples)
-    SFT = ShortTimeFFT(win,hop,sr, mfft=n_bins)
-
-    return SFT.f_pts
-
-def get_times(signal, sr, win_samples, hop=None, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = None, p0=1, **kwargs):
+def get_times(signal, sr, win_samples, hop=None, window = "blackman", padding="odd", detrend=None, n_bins:int = None, t_phase = None, p0=1, **kwargs):
     if hop is None:
         hop = win_samples
     if t_phase is None:
@@ -97,7 +78,7 @@ def get_times(signal, sr, win_samples, hop=None, window = "boxcar", padding="odd
 
     return SFT.t(len(signal), p0=p0, **kwargs) + t_phase
 
-def stft       (signal, sr, win_samples, hop=None, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = None, p0=1, **kwargs):
+def stft       (signal, sr, win_samples, hop=None, window = "blackman", padding="odd", detrend=None, n_bins:int = None, t_phase = None, p0=1, **kwargs):
     if hop is None:
         hop = win_samples
     if t_phase is None:
@@ -115,7 +96,7 @@ def stft       (signal, sr, win_samples, hop=None, window = "boxcar", padding="o
 
     return time, freq, Zxx
 
-def spectrogram(signal, sr, win_samples, hop=None, window = "boxcar", padding="odd", detrend=None, n_bins:int = None, t_phase = None, p0=1, **kwargs):
+def spectrogram(signal, sr, win_samples, hop=None, window = "blackman", padding="odd", detrend=None, n_bins:int = None, t_phase = None, p0=1, **kwargs):
     if hop is None:
         hop = win_samples
     if t_phase is None:
@@ -133,3 +114,106 @@ def spectrogram(signal, sr, win_samples, hop=None, window = "boxcar", padding="o
 
     return time, freq, Sxx
 
+def STFT(sr, win_samples, hop=None, window="blackman", n_bins:int = None, **kwargs):
+    """
+    Creates a scipy.ShortTimeFFT object with the selected parameters.
+
+    Args:
+        sr (float): Sampling rate in Hz.
+        win_samples (int): Number of samples in each window (window length).
+        hop (int, optional): Number of samples to advance between windows. 
+            If None, defaults to win_samples (no overlap).
+        window (str, optional): Windowing function to use. Supports any window 
+            string compatible with scipy.signal.get_window. Defaults to "blackman".
+        n_bins (int, optional): Number of FFT bins (mfft). If None, defaults 
+            to win_samples.
+        **kwargs: Additional keyword arguments for scipy.ShortTimeFFT.
+
+    Returns:
+        scipy.signal.ShortTimeFFT: The configured ShortTimeFFT object.
+    """
+    if hop is None:
+        hop = win_samples
+        
+    win = get_window(window, win_samples)
+
+    # Passing **kwargs here allows users to customize the SFT object 
+    # with parameters like 'scale_to' or 'phase_shift'.
+    SFT = ShortTimeFFT(win, hop, fs=sr, mfft=n_bins, **kwargs)
+
+    return SFT
+
+
+
+import multiprocessing as mp
+from functools import partial
+
+def _stft_worker(signal, SFT, **kwargs):
+    """
+    Internal worker function to process a single 1D signal.
+    
+    Checks for detrending requirements in kwargs before choosing the 
+    appropriate ShortTimeFFT method.
+
+    Args:
+        signal (np.ndarray): 1D array representing a single signal segment.
+        SFT (scipy.signal.ShortTimeFFT): The STFT configuration object.
+        **kwargs: Arbitrary keyword arguments passed to the STFT method. 
+            If "detrend" or "detr" is present, uses SFT.stft_detrend.
+
+    Returns:
+        np.ndarray: Complex-valued STFT coefficients (Zxx).
+    """
+    if "detr" in kwargs:
+        return SFT.stft_detrend(signal, **kwargs)
+    else:
+        return SFT.stft(signal, **kwargs)
+
+def stft_parallel(signal_tensor, SFT, cores=None, **kwargs):
+    """
+    Parallelizes STFT across a multi-dimensional tensor.
+    
+    This function flattens the leading dimensions of the input tensor,
+    distributes the 1D STFT calculations across multiple CPU cores, 
+    and reconstructs the multi-dimensional shape in the output.
+
+    
+
+    Args:
+        signal_tensor (np.ndarray): Input data of shape (..., N), where N 
+            is the number of samples in the signal.
+        SFT (scipy.signal.ShortTimeFFT): Pre-configured SciPy STFT object.
+        cores (int, optional): Number of parallel workers. Defaults to 
+            mp.cpu_count() // 2.
+        **kwargs: Additional arguments passed to the STFT worker 
+            (e.g., detrend='linear').
+
+    Returns:
+        tuple: (t, f, zxx_reshaped)
+            - t (np.ndarray): 1D array of time points.
+            - f (np.ndarray): 1D array of frequency bins.
+            - zxx_reshaped (np.ndarray): Complex STFT tensor of shape 
+              (..., n_freqs, n_times).
+    """
+    if cores is None:
+        cores = mp.cpu_count() // 2
+
+    original_shape = signal_tensor.shape
+    # Flatten everything except the last dimension (the signal)
+    flat_signals = signal_tensor.reshape(-1, original_shape[-1])
+    
+    worker_with_args = partial(_stft_worker, SFT=SFT, **kwargs)
+
+    with mp.Pool(processes=cores) as pool:
+        results = pool.map(worker_with_args, flat_signals)
+
+    zxx_array = np.array(results) 
+    
+    f = SFT.f
+    t = SFT.t(original_shape[-1])
+    
+    # Reconstruct shape: Leading dims + Frequency Dim + Time Dim
+    final_shape = original_shape[:-1] + zxx_array.shape[1:]
+    zxx_reshaped = zxx_array.reshape(final_shape)
+
+    return t, f, zxx_reshaped
