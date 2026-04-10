@@ -146,3 +146,27 @@ def spectrogram_grid(ts, fs, Sxxs, nrows, ncols, xlim=None, ylim=None, vmin=None
         plt.show()
 
     return fig, axes
+
+def dual_plot(signal, Sxx, times, freqs, xaxis = "samples", sr = None, **kwargs):
+
+    assert freqs.shape[0] == Sxx.shape[0], f"Frequency mismatch: {freqs.shape[0]} frequency bins provided, but spectrogram has {Sxx.shape[0]} rows."
+    assert times.shape[0] == Sxx.shape[1], f"Time mismatch: {times.shape[0]} time points provided, but spectrogram has {Sxx.shape[1]} columns."
+
+    if sr is None: sr = int(len(signal)//len(times))
+    if xaxis == "samples":
+        times_arr = times*sr
+    if xaxis == "seconds":
+        times_arr = np.linspace(0, signal.shape[0]/sr, signal.shape[0])
+        
+
+    fig, ax = plt.subplots(2,1, sharex=True)
+    ax[0].plot(np.linspace(0, len(signal)/sr, len(signal)),signal)
+    _, _ , mesh = spectrogram(times, freqs, Sxx, ax = ax[1], **kwargs);
+
+
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+    divider = make_axes_locatable(ax[1])
+    cax = divider.append_axes("bottom", size="15%", pad=0.4)
+    fig.colorbar(mesh, cax=cax, orientation='horizontal');
+
+    return fig

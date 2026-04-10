@@ -1,7 +1,8 @@
 %% EEG - Multivariate Exploratory Signal Analysis
 
-load("../data/EEG/EEG.mat")
+load("external/data/EEG/EEG.mat")
 size(X_unfold)
+
 %% PCA
 
 varPca(X_unfold, "PCs", 1:10, "Preprocessing", 0, "PlotCkf", true);
@@ -66,6 +67,7 @@ X = X_unfold(subset, :);
 F = F(:,subset);
 [T, parglmo] = parglm(X, double(F)', 'Preprocessing',0, 'Ordinal', [0 0 0 0 0 0 0], 'Model', 'linear');
 ascao = asca(parglmo);
+1+1
 %%
 T.Source(2) = {'F1: Subject'};
 T.Source(3) = {'F2: Age'};
@@ -78,13 +80,17 @@ T
 save EEG_asca T ascao 
 %%
 modified_ascao = ascao;
-factor_id = 1;
+factor_id = 6;
 
-modified_ascao.factors{factor_id}.lvs=1:2;
+modified_ascao.factors{factor_id}.lvs=1:1;
 [~, idx] = sort(F(factor_id,:));
 classification = F(factor_id, idx);
+% classification = F(factor_id, :);
 
-modified_ascao.factors{factor_id}.scoresV = modified_ascao.factors{factor_id}.scoresV(idx, :);
-scores(modified_ascao.factors{factor_id}, "ObsLabel", classification, "ObsClass", classification, "Color", "parula" );
-set(gcf,'units','normalized','outerposition',[0 0 1 2]);
+% classification = string(F_quality(subset));
+
+% modified_ascao.factors{factor_id}.scoresV = modified_ascao.factors{factor_id}.scoresV(idx, :);
+
+scores(modified_ascao.factors{factor_id}, "ObsLabel", classification, "ObsClass", classification, "Color", "okabeIto");
+% set(gcf,'units','normalized','outerposition',[0 0 1 2]);
 %%

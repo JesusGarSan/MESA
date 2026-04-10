@@ -210,3 +210,9 @@ def test_spectrogram_grid():
 
     plt.show()
     return
+
+def test_dual_plot():
+    times, freqs, Sxx = features.spectrogram(y, 50, 10, 2)
+    
+    fig = plot.dual_plot(y, Sxx, times, freqs, sr=100, logscale=True)
+    plt.show()
