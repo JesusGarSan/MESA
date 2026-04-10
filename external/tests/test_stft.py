@@ -1,16 +1,29 @@
-import src.msa.feature_extraction.features as features
+from mesa.features import stft
 import numpy as np
 
-def test_build_STFT():
-    SFT = features.STFT(100.0, 100, 33, "hann", None)
+
+
+def test_stft_minimal_call():
+    y = np.ones(100)
+    D = stft(y, 10)
     return
 
-def test_parallelization():
-    SFT = features.STFT(100.0, 100, 33, "hann", None)
-    signal_tensor = np.ones([3, 5, 4, 100])
-    _, _, Zxx = features.stft_parallel(signal_tensor, SFT, None, detr="linear")
+def test_stft_dimension():
+    y = np.ones(100)
+    D = stft(y, 10)
+    assert D.shape == (6, 10) # n_freqs=10/2+1, n_times = 100/10
 
-    assert signal_tensor.shape[:-1] == Zxx.shape[:-2]
+def test_stft_multi_signal_dimensions():
+    y = np.ones((10, 20, 100)) # Last axis is interpreted as time
+    D = stft(y, 10)
+    assert D.shape == (10, 20, 6, 10) 
+
+def test_stft_freq_decimation_dimensions():
+    y = np.ones(500)
+    D = stft(y, 50, n_fft=6)
+    assert D.shape == (4, 10) # n_freqs=n_fft/2+1, n_times = 100/10
+    D = stft(y, 50, n_fft=5, freq_decimation_method="average")
+    assert D.shape == (3, 10) # n_freqs=n_fft/2+1, n_times = 100/10
 
 
 
