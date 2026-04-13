@@ -164,7 +164,9 @@ def dual_plot(signal: np.ndarray, Sxx: np.ndarray, sr: int,
               y_axis:Literal[None,"none","off", 'linear', 'fft','hz','log','fft_note','fft_svara',
                                'mel','cqt_hz','cqt_note','cqt_svara','vqt_fjs']="hz",
               figsize: tuple = (10, 8),
-              cb_kwargs={'orientation': 'horizontal', 'pad': 0.15, 'label': 'Magnitude','aspect':80}):
+              cb_kwargs={'orientation': 'horizontal', 'pad': 0.15, 'label': 'Magnitude','aspect':80},
+              **kwargs):
+
     """
     Creates a stacked subplot showing the raw signal waveform above its spectrogram.
     
@@ -212,7 +214,7 @@ def dual_plot(signal: np.ndarray, Sxx: np.ndarray, sr: int,
     _, mesh = spectrogram(Sxx, sr=sr, win_length=win_length, hop=hop, 
                              n_fft=n_fft, center=center, x_axis=x_axis, 
                              y_axis=y_axis, ax=ax_bottom,
-                             cb_kwargs=cb_kwargs)
+                             cb_kwargs=cb_kwargs, **kwargs)
     ax_bottom.set_title("Spectrogram")
 
     plt.tight_layout(rect=[0, 0.03, 1, 0.95]) 

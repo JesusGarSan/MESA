@@ -12,7 +12,7 @@ D = stft(y, win_length)
 Sxx = np.abs(D)**2
 
 import matplotlib.pyplot as plt
-show_figure = True
+show_figure = False
 
 
 def test_plot_signal_minimal_call():
