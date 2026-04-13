@@ -1,4 +1,4 @@
-from mesa.visualization import spectrogram, plot_signal, dual_plot
+from mesa.visualization import spectrogram, plot_signal, dual_plot, multi_spectrogram
 from mesa.features import stft
 import numpy as np
 
@@ -75,4 +75,14 @@ def test_dual_plot_hop_centered():
     ax = fig.get_axes()
     # ax[1].set_xlim([-.25,3.25])
     if show_figure: plt.show()
+    return
+
+def test_multi_spectrogram_minimal_call():
+    Sxx_multi = Sxx[np.newaxis, np.newaxis, :,:]
+    Sxx_multi = np.tile(Sxx_multi, (3,2,1,1,))
+    Sxx_multi[1,1,:,20:25] = 1e10
+    Sxx_multi[0,0] = 0*Sxx_multi[0,0]
+    fig = multi_spectrogram(Sxx_multi, rows=[1,0], cols=[], sr = sr, win_length=win_length)
+    if show_figure: plt.show()
+
     return

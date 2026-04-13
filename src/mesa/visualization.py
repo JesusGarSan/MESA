@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 import librosa
-from typing import Literal
+from typing import Literal, List
 
 def plot_signal(signal: np.ndarray, sr: int, 
                 x_axis: Literal["time", "s", "ms", "samples"] = "time",
@@ -80,7 +80,7 @@ def spectrogram(Sxx: np.ndarray, sr:int, win_length:int, hop:int = None, n_fft:i
                                'mel','cqt_hz','cqt_note','cqt_svara','vqt_fjs']="hz",
                 colorbar:bool = True,
                 cb_kwargs: dict = None,
-                ax = None):
+                ax = None, **kwargs):
     """
     Visualizes a spectrogram with support for non-centered window alignment.
 
@@ -149,7 +149,7 @@ def spectrogram(Sxx: np.ndarray, sr:int, win_length:int, hop:int = None, n_fft:i
 
     mesh = librosa.display.specshow(Sxx, sr=sr, hop_length=hop, n_fft=n_fft, win_length = win_length,
                              x_axis=x_axis, y_axis=y_axis, ax = ax,
-                             x_coords=x_coords)
+                             x_coords=x_coords, **kwargs)
     if colorbar:
             # Default to empty dict if None
             cb_kwargs = cb_kwargs or {}
@@ -219,3 +219,74 @@ def dual_plot(signal: np.ndarray, Sxx: np.ndarray, sr: int,
 
     return fig
 
+
+def multi_spectrogram(Sxx: np.ndarray, 
+                      rows: List[int], 
+                      cols: List[int], 
+                      sr: int, 
+                      win_length: int, 
+                      **kwargs):
+
+    row_set = set(rows)
+    col_set = set(cols)
+    
+    if not row_set.isdisjoint(col_set):
+        overlapping = row_set.intersection(col_set)
+        raise ValueError(f"Indices {overlapping} cannot be in both 'rows' and 'cols'.")
+    
+    total_dims = set(range(Sxx.ndim))
+    provided_dims = row_set.union(col_set)
+    if not provided_dims.issubset(total_dims):
+        invalid = provided_dims - total_dims
+        raise IndexError(f"Indices {invalid} are out of bounds for array with {X.ndim} dimensions.")
+
+    row_sizes = [Sxx.shape[i] for i in rows]
+    col_sizes = [Sxx.shape[i] for i in cols]
+    
+    num_rows = np.prod(row_sizes, dtype=int)
+    num_cols = np.prod(col_sizes, dtype=int)
+    
+    # Pre-calculate global min/max for a shared color scale
+    vmin = kwargs.pop('vmin', np.min(Sxx))
+    vmax = kwargs.pop('vmax', np.max(Sxx))
+    
+    fig, axes = plt.subplots(num_rows, num_cols, 
+                             figsize=(num_cols * 4, num_rows * 3), 
+                             squeeze=False,
+                             constrained_layout=True,
+                             sharex=True,
+                             sharey=True)
+    
+
+    meshes = [] # Store all meshes
+    for r_idx, r_coords in enumerate(np.ndindex(*row_sizes)):
+        for c_idx, c_coords in enumerate(np.ndindex(*col_sizes)):
+            
+            slicer = [slice(None)] * Sxx.ndim
+            for i, dim in enumerate(rows): slicer[dim] = r_coords[i]
+            for i, dim in enumerate(cols): slicer[dim] = c_coords[i]
+                
+            Sxx_slice = Sxx[tuple(slicer)]
+            
+            while Sxx_slice.ndim > 2:
+                Sxx_slice = Sxx_slice[0]
+            
+            ax = axes[r_idx, c_idx]
+            
+            # Call spectrogram with forced vmin/vmax and no individual colorbars
+            _, mesh = spectrogram(Sxx_slice, sr=sr, win_length=win_length, 
+                                       ax=ax, colorbar=False, 
+                                       cb_kwargs={"vmin": vmin, "vmax":vmax}, **kwargs)
+            meshes.append(mesh)
+
+            # Clean up redundant labels
+            if c_idx > 0: ax.set_ylabel("")
+            if r_idx < num_rows - 1: ax.set_xlabel("")
+            
+    # Add one global colorbar using the last mesh created
+    # We pass the list of axes to ensure the colorbar doesn't only shrink the last subplot
+    if meshes:
+        cb = fig.colorbar(meshes[0], ax=axes.ravel().tolist(), location='right', aspect=40)
+        cb.set_label('Magnitude (dB)' if 'y_axis' in kwargs else 'Power')
+
+    return fig, axes
