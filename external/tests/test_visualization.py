@@ -11,22 +11,68 @@ win_length = int(sr*0.25)
 D = stft(y, win_length)
 Sxx = np.abs(D)**2
 
-
 import matplotlib.pyplot as plt
+show_figure = True
+
 
 def test_plot_signal_minimal_call():
     fig  = plot_signal(y, sr)
-    plt.show()
+    if show_figure: plt.show()
     return
 
 def test_spectrogram_minimal_call():
     fig, _  = spectrogram(Sxx,sr,win_length)
-    plt.show()
+    if show_figure: plt.show()
+    return
+
+def test_spectrogram_centered():
+    fig, _  = spectrogram(Sxx,sr,win_length, center=True)
+    if show_figure: plt.show()
+    return
+
+def test_spectrogram_hop():
+    hop = int(sr*.15)
+    D = stft(y, win_length, hop)
+    Sxx = np.abs(D)**2
+
+    fig, _  = spectrogram(Sxx,sr,win_length, hop)
+    if show_figure: plt.show()
+    return
+
+def test_spectrogram_hop_centered():
+    hop = int(sr*.15)
+    D = stft(y, win_length, hop, center=True)
+    Sxx = np.abs(D)**2
+
+    fig, _  = spectrogram(Sxx,sr,win_length, hop, center=True)
+    if show_figure: plt.show()
     return
 
 def test_dual_plot_minimal_call():
     fig = dual_plot(y, Sxx,sr,win_length)
     ax = fig.get_axes()
-    # ax[0].set_xlim([0,2])
-    plt.show()
+    # ax[1].set_xlim([-.25,3.25])
+    if show_figure: plt.show()
+    return
+
+def test_dual_plot_hop():
+    hop = int(sr*.15)
+    D = stft(y, win_length, hop)
+    Sxx = np.abs(D)**2
+
+    fig = dual_plot(y, Sxx,sr,win_length,hop)
+    ax = fig.get_axes()
+    # ax[1].set_xlim([-.25,3.25])
+    if show_figure: plt.show()
+    return
+
+def test_dual_plot_hop_centered():
+    hop = int(sr*.15)
+    D = stft(y, win_length, hop, center=True)
+    Sxx = np.abs(D)**2
+
+    fig = dual_plot(y, Sxx,sr,win_length,hop, center=True)
+    ax = fig.get_axes()
+    # ax[1].set_xlim([-.25,3.25])
+    if show_figure: plt.show()
     return

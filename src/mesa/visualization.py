@@ -13,6 +13,7 @@ def plot_signal(signal: np.ndarray, sr: int,
                 label: str = None, 
                 color: str = None, 
                 alpha: float = 1.0,
+                offset: float = 0.0,
                 ax: Axes = None):
     """
     Plots the waveform of a raw input signal.
@@ -52,9 +53,8 @@ def plot_signal(signal: np.ndarray, sr: int,
             raise TypeError("ax must be an instance of matplotlib.axes.Axes")
         fig = ax.get_figure()
 
-    # Use librosa's waveshow for an efficient envelope-based visualization
     librosa.display.waveshow(signal, sr=sr, axis=x_axis, ax=ax, 
-                             label=label, color=color, alpha=alpha)
+                             label=label, color=color, alpha=alpha, offset=offset)
 
     # Standardize labels and limits
     if x_axis in ["time", "s"]:
@@ -66,7 +66,6 @@ def plot_signal(signal: np.ndarray, sr: int,
 
     ax.set_ylabel("Amplitude")
     
-    # Ensure the plot starts exactly at zero
     ax.set_xlim(left=0)
 
     if label:
@@ -74,7 +73,7 @@ def plot_signal(signal: np.ndarray, sr: int,
 
     return fig
 
-def spectrogram(Sxx, sr:int, win_length:int, hop:int = None, n_fft:int = None,
+def spectrogram(Sxx: np.ndarray, sr:int, win_length:int, hop:int = None, n_fft:int = None,
                 center:bool = False,
                 x_axis:Literal["time", 'h','m','s','ms','lag','lag_h','lag_m','lag_s','lag_ms']="time",
                 y_axis:Literal[None,"none","off", 'linear', 'fft','hz','log','fft_note','fft_svara',
@@ -136,25 +135,21 @@ def spectrogram(Sxx, sr:int, win_length:int, hop:int = None, n_fft:int = None,
 
     if ax is None: 
         fig, ax = plt.subplots(1,1)
-    else: fig = ax.get_figure()
-    mesh = librosa.display.specshow(Sxx, sr=sr, hop_length=hop, n_fft=n_fft, win_length = win_length,
-                             x_axis=x_axis, y_axis=y_axis, ax = ax)
-    
-    # Make the xticks not centered
-    if not center and x_axis == "time":
-        ax = plt.gca()
-        plt.gcf().canvas.draw()
-        
-        locs = ax.get_xticks()
-        labels = [t.get_text() for t in ax.get_xticklabels()]
-        
-        offset = (win_length / 2.0) / sr 
-        new_locs = locs - offset
-        
-        ax.set_xticks(new_locs)
-        ax.set_xticklabels(labels)
-        ax.set_xlim([-offset, new_locs[-1]])
+    else:
+        fig = ax.get_figure()
 
+    # Make the xticks not centered
+    x_coords = None
+    if not center and x_axis == "time":
+        frames = np.arange(Sxx.shape[1])
+        x_coords = librosa.frames_to_time(frames, sr=sr, hop_length=hop, n_fft=n_fft)
+        shift = librosa.samples_to_time(hop, sr=sr)
+        window_length_seconds = librosa.samples_to_time(win_length, sr = sr)
+        x_coords = x_coords - window_length_seconds/2 + shift/2
+
+    mesh = librosa.display.specshow(Sxx, sr=sr, hop_length=hop, n_fft=n_fft, win_length = win_length,
+                             x_axis=x_axis, y_axis=y_axis, ax = ax,
+                             x_coords=x_coords)
     if colorbar:
             # Default to empty dict if None
             cb_kwargs = cb_kwargs or {}
@@ -165,8 +160,9 @@ def spectrogram(Sxx, sr:int, win_length:int, hop:int = None, n_fft:int = None,
 def dual_plot(signal: np.ndarray, Sxx: np.ndarray, sr: int, 
               win_length: int, hop: int = None, n_fft: int = None,
               center: bool = False,
-              x_axis: Literal["time", "s"] = "time",
-              y_axis: str = "hz",
+              x_axis:Literal["time", 'h','m','s','ms','lag','lag_h','lag_m','lag_s','lag_ms']="time",
+              y_axis:Literal[None,"none","off", 'linear', 'fft','hz','log','fft_note','fft_svara',
+                               'mel','cqt_hz','cqt_note','cqt_svara','vqt_fjs']="hz",
               figsize: tuple = (10, 8),
               cb_kwargs={'orientation': 'horizontal', 'pad': 0.15, 'label': 'Magnitude','aspect':80}):
     """
@@ -206,24 +202,20 @@ def dual_plot(signal: np.ndarray, Sxx: np.ndarray, sr: int,
     if hop is None:
         hop = win_length
 
-    # Create the subplots with shared X axis
     fig, (ax_top, ax_bottom) = plt.subplots(2, 1, sharex=True, figsize=figsize, 
                                             gridspec_kw={'height_ratios': [1, 2]})
 
-    # 1. Plot the raw signal on the top axis
     plot_signal(signal, sr=sr, x_axis=x_axis, ax=ax_top)
     ax_top.set_title("Waveform")
-    ax_top.set_xlabel("") # Hide xlabel on top because it's shared
+    ax_top.set_xlabel("") 
 
-    # 2. Plot the spectrogram on the bottom axis
     _, mesh = spectrogram(Sxx, sr=sr, win_length=win_length, hop=hop, 
                              n_fft=n_fft, center=center, x_axis=x_axis, 
                              y_axis=y_axis, ax=ax_bottom,
                              cb_kwargs=cb_kwargs)
     ax_bottom.set_title("Spectrogram")
 
-    # Final visual refinements
-    plt.tight_layout(rect=[0, 0.03, 1, 0.95]) # Adjust for the suptitle
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95]) 
 
     return fig
 
