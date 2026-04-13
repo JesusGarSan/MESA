@@ -225,6 +225,8 @@ def multi_spectrogram(Sxx: np.ndarray,
                       cols: List[int], 
                       sr: int, 
                       win_length: int, 
+                      hop:int = None,
+                      n_fft:int = None,
                       **kwargs):
 
     row_set = set(rows)
@@ -238,7 +240,7 @@ def multi_spectrogram(Sxx: np.ndarray,
     provided_dims = row_set.union(col_set)
     if not provided_dims.issubset(total_dims):
         invalid = provided_dims - total_dims
-        raise IndexError(f"Indices {invalid} are out of bounds for array with {X.ndim} dimensions.")
+        raise IndexError(f"Indices {invalid} are out of bounds for array with {Sxx.ndim} dimensions.")
 
     row_sizes = [Sxx.shape[i] for i in rows]
     col_sizes = [Sxx.shape[i] for i in cols]
@@ -274,9 +276,10 @@ def multi_spectrogram(Sxx: np.ndarray,
             ax = axes[r_idx, c_idx]
             
             # Call spectrogram with forced vmin/vmax and no individual colorbars
-            _, mesh = spectrogram(Sxx_slice, sr=sr, win_length=win_length, 
-                                       ax=ax, colorbar=False, 
-                                       cb_kwargs={"vmin": vmin, "vmax":vmax}, **kwargs)
+            _, mesh = spectrogram(Sxx_slice, sr=sr, win_length=win_length, hop=hop, n_fft=n_fft,
+                                    ax=ax, colorbar=False, 
+                                    cb_kwargs={"vmin": vmin, "vmax":vmax},
+                                    vmin = vmin, vmax = vmax, **kwargs)
             meshes.append(mesh)
 
             # Clean up redundant labels
