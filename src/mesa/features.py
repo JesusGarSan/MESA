@@ -85,3 +85,11 @@ def stft(signal:np.array, win_length:int, hop:int = None, n_fft:int = None,
                 pass
 
     return D
+
+def stft_labels(D:np.array, sr:int, hop:int, n_fft:int=None):
+
+    freqs = librosa.fft_frequencies(sr=sr, n_fft=n_fft)
+    n_frames = D.shape[-1]
+    times = librosa.frames_to_time(np.arange(n_frames), sr=sr, hop_length=hop)
+
+    return times, freqs
