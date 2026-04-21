@@ -64,31 +64,34 @@ def unfold_2D(X: np.ndarray, rows: list, cols: list, labels:list = None, label_n
         row_label_names = []
 
         row_list = list(row_set)
-        for row_id in row_list:
+        for row_id, row in enumerate(row_list):
             smaller_dims_id  =  row_list[:row_id] # Left hand-side
             smaller_dims = [X.shape[i] for i in smaller_dims_id]
             larger_dims_id =  row_list[row_id+1:] # Right hand-side
             larger_dims = [X.shape[i] for i in larger_dims_id]
-            aux = np.repeat(labels[row_id], np.prod(smaller_dims))
+            aux = np.repeat(labels[row], np.prod(smaller_dims))
             aux = np.tile (aux, np.prod(larger_dims))
             row_labels.append(aux)
-            row_label_names.append(label_names[row_id])
+            if label_names is not None:
+                row_label_names.append(label_names[row_id])
             
         col_labels = []
         col_label_names = []
 
         col_list = list(col_set)
-        for col_id in col_list:
+        for col_id, col in enumerate(col_list):
             smaller_dims_id  =  col_list[:col_id] # Left hand-side
             smaller_dims = [X.shape[i] for i in smaller_dims_id]
             larger_dims_id =  col_list[col_id+1:] # Right hand-side
             larger_dims = [X.shape[i] for i in larger_dims_id]
-            aux = np.repeat(labels[col_id], np.prod(smaller_dims))
+            aux = np.repeat(labels[col], np.prod(smaller_dims))
             aux = np.tile (aux, np.prod(larger_dims))
             col_labels.append(aux)
-            col_label_names.append(label_names[col_id])
+            if label_names is not None:
+                col_label_names.append(label_names[col_id])
 
         labels_unfold = [row_labels, col_labels]
-        label_names_unfold = [row_label_names, col_label_names]
+        if label_names is not None:
+            label_names_unfold = [row_label_names, col_label_names]
 
     return X_permuted.reshape(row_size, col_size), labels_unfold, label_names_unfold
