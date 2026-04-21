@@ -50,7 +50,7 @@ def plot_signal(signal: np.ndarray, sr: int,
         fig, ax = plt.subplots(1, 1)
     else:
         if not isinstance(ax, Axes):
-            raise TypeError("ax must be an instance of matplotlib.axes.Axes")
+            raise TypeError("ax  must be an instance of matplotlib.axes.Axes")
         fig = ax.get_figure()
 
     librosa.display.waveshow(signal, sr=sr, axis=x_axis, ax=ax, 

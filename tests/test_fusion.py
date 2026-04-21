@@ -21,12 +21,12 @@ def test_unfold_2D_with_labels():
               [1,2]]
     label_names = ["Y/N", "supernenas", "numbers"]
 
-    X_unfold, labels_unfold, label_names_unfold = unfold_2D(X, rows=[], cols=[0,1,2], labels=labels)
+    X_unfold, labels_unfold, label_names_unfold = unfold_2D(X, rows=[], cols=[2,1,0], labels=labels)
 
-    assert (labels_unfold[1][0] == ['YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO']).all()
+    assert (labels_unfold[1][0] == [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]).all()
     assert (labels_unfold[1][1] == ['burbuja', 'burbuja', 'cactus', 'cactus', 'pétalo', 'pétalo',
                                     'burbuja', 'burbuja', 'cactus', 'cactus', 'pétalo', 'pétalo']).all()
-    assert (labels_unfold[1][2] == [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]).all()
+    assert (labels_unfold[1][2] == ['YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO']).all()
 
 
 
@@ -39,11 +39,11 @@ def test_unfold_2D_with_label_names():
               [1,2]]
     label_names = ["Y/N", "supernenas", "numbers"]
 
-    X_unfold, labels_unfold, label_names_unfold = unfold_2D(X, rows=[], cols=[0,1,2], labels=labels, label_names=label_names)
+    X_unfold, labels_unfold, label_names_unfold = unfold_2D(X, rows=[], cols=[2,1,0], labels=labels, label_names=label_names)
 
-    assert label_names_unfold[1] == ["Y/N", "supernenas", "numbers"]
+    assert label_names_unfold[1] == ["numbers", "supernenas", "Y/N"]
 
-    assert (labels_unfold[1][0] == ['YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO']).all()
+    assert (labels_unfold[1][0] == [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]).all()
     assert (labels_unfold[1][1] == ['burbuja', 'burbuja', 'cactus', 'cactus', 'pétalo', 'pétalo',
                                     'burbuja', 'burbuja', 'cactus', 'cactus', 'pétalo', 'pétalo']).all()
-    assert (labels_unfold[1][2] == [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]).all()
+    assert (labels_unfold[1][2] == ['YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO']).all()

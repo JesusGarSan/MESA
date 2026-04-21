@@ -11,22 +11,33 @@ def unfold_2D(X: np.ndarray, rows: list, cols: list, labels:list = None, label_n
     Unfolds a multi-dimensional array X into a 2D matrix. Optionally provides according label unfolding.
     
     Args:
-        X: The input numpy array.
-        rows: List of dimension indices to be mapped to the resulting matrix rows. Lower id axis contain higher id axis.
-        cols: List of dimension indices to be mapped to the resulting matrix columns. Lower id axis contain higher id axis.
+        X: The input numpy array to be transformed.
+        rows: List of dimension indices to be mapped to the resulting matrix rows. 
+              The order determines the hierarchy: earlier indices contain later indices (Kronecker product order).
+        cols: List of dimension indices to be mapped to the resulting matrix columns. 
+              The order determines the hierarchy: earlier indices contain later indices (Kronecker product order).
+        labels: List of lists containing labels for each dimension of X. 
+                Each inner list must match the size of its corresponding dimension in X.
+        label_names: List of strings providing a name for each dimension in X.
+
+    Returns:
+        X_reshaped: The 2D unfolded version of the input array.
+        labels_unfold: A list [row_labels, col_labels] containing the expanded label arrays, or None.
+        label_names_unfold: A list [row_label_names, col_label_names] containing the names of the 
+                            dimensions assigned to rows and columns, or None.
     """
 
     # Label dimensions verifications
     if label_names is not None:
         if labels is not None:
-            assert len(label_names) == len(labels), f"label_names length ({len(label_names)}) must match labels length ({len(labels)}))."
+            assert len(label_names) == len(labels), f"label_names length ({len(label_names)})  must match labels length ({len(labels)}))."
 
         for i, label in enumerate(labels):
-            assert len(label) == X.shape[i], f'label "{label_names[i]}" length ({len(label)}) should must match X.shape[{i}] ({X.shape[i]}).'
+            assert len(label) == X.shape[i], f'label "{label_names[i]}" length ({len(label)}) must match X.shape[{i}] ({X.shape[i]}).'
 
     if labels is not None:
         for i, label in enumerate(labels):
-            assert len(label) == X.shape[i], f"label[{i}] length ({len(label)}) should must match X.shape[{i}] ({X.shape[i]})."
+            assert len(label) == X.shape[i], f"label[{i}] length ({len(label)}) must match X.shape[{i}] ({X.shape[i]})."
 
 
     row_set = set(rows)
@@ -34,12 +45,6 @@ def unfold_2D(X: np.ndarray, rows: list, cols: list, labels:list = None, label_n
     all_dims = set(range(X.ndim))
     provided_dims = row_set.union(col_set)
     ignored_dims = all_dims - provided_dims
-    
-    # Get subselection of labels
-    # if labels is not None:
-    #     labels = [labels[i] for i in provided_dims]
-    # if label_names is not None:
-    #     label_names = [label_names[i] for i in provided_dims]
 
     # Get subselection of X Tensor
     selection = [0 if i in ignored_dims else slice(None) for i in range(X.ndim)]
@@ -60,38 +65,30 @@ def unfold_2D(X: np.ndarray, rows: list, cols: list, labels:list = None, label_n
     labels_unfold = None
     label_names_unfold = None
     if labels:
-        row_labels = []
-        row_label_names = []
+            def unfold_axis_labels(axis_indices):
+                unfolded_list = []
+                # Use the actual order of axis_indices, not a set
+                for i, axis_idx in enumerate(axis_indices):
+                    # How many times to repeat each element (dimensions to the right)
+                    repeat_count = np.prod([X.shape[dim] for dim in axis_indices[i+1:]], dtype=int)
+                    # How many times to tile the whole block (dimensions to the left)
+                    tile_count = np.prod([X.shape[dim] for dim in axis_indices[:i]], dtype=int)
+                    
+                    # Apply Kronecker logic: Tile(Repeat(label))
+                    aux = np.repeat(labels[axis_idx], repeat_count)
+                    aux = np.tile(aux, tile_count)
+                    unfolded_list.append(aux)
+                return unfolded_list
 
-        row_list = list(row_set)
-        for row_id, row in enumerate(row_list):
-            smaller_dims_id  =  row_list[:row_id] # Left hand-side
-            smaller_dims = [X.shape[i] for i in smaller_dims_id]
-            larger_dims_id =  row_list[row_id+1:] # Right hand-side
-            larger_dims = [X.shape[i] for i in larger_dims_id]
-            aux = np.repeat(labels[row], np.prod(smaller_dims))
-            aux = np.tile (aux, np.prod(larger_dims))
-            row_labels.append(aux)
-            if label_names is not None:
-                row_label_names.append(label_names[row_id])
+            row_labels = unfold_axis_labels(rows)
+            col_labels = unfold_axis_labels(cols)
             
-        col_labels = []
-        col_label_names = []
-
-        col_list = list(col_set)
-        for col_id, col in enumerate(col_list):
-            smaller_dims_id  =  col_list[:col_id] # Left hand-side
-            smaller_dims = [X.shape[i] for i in smaller_dims_id]
-            larger_dims_id =  col_list[col_id+1:] # Right hand-side
-            larger_dims = [X.shape[i] for i in larger_dims_id]
-            aux = np.repeat(labels[col], np.prod(smaller_dims))
-            aux = np.tile (aux, np.prod(larger_dims))
-            col_labels.append(aux)
+            labels_unfold = [row_labels, col_labels]
+            
             if label_names is not None:
-                col_label_names.append(label_names[col_id])
-
-        labels_unfold = [row_labels, col_labels]
-        if label_names is not None:
-            label_names_unfold = [row_label_names, col_label_names]
+                # Map names using the same original index
+                row_label_names = [label_names[i] for i in rows]
+                col_label_names = [label_names[i] for i in cols]
+                label_names_unfold = [row_label_names, col_label_names]
 
     return X_permuted.reshape(row_size, col_size), labels_unfold, label_names_unfold
