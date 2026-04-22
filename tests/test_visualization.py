@@ -89,3 +89,9 @@ def test_multi_spectrogram_minimal_call():
     if show_figure: plt.show()
 
     return
+
+def test_spectrogram_trimmed():
+    Sxx_trimmed = Sxx[0:11,:]
+    fig, _  = spectrogram(Sxx_trimmed,sr,win_length, y_coords = np.arange(11))
+    if show_figure: plt.show()
+    return
