@@ -69,8 +69,8 @@ dummy(idx) = -1;
 omeda_vec = omeda(X, dummy, model.loads);
 
 %%
-if false
-    close all;
+% close all;
+if true
     subject_ids = 5:10;
     channel_id = 4;
 
@@ -86,7 +86,7 @@ if false
     end
 end
 %%
-if false
+if true
     [~, idx] = sort(freqs_filtered);
     plotVec(omeda_vec(idx), 'ObsClass', freqs_label(idx)); title("oMEDA Baseline vs. Arithmetic: Frequencies")
     [~, idx] = sort(channels_filtered);
