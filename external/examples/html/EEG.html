@@ -9,7 +9,7 @@ To make changes, update the MATLAB code and republish this document.
 <title>EEG</title>
 <meta name="generator" content="MATLAB 25.1">
 <link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
-<meta name="DC.date" content="2026-04-23">
+<meta name="DC.date" content="2026-04-28">
 <meta name="DC.source" content="EEG.m">
 <style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
@@ -163,14 +163,14 @@ disp(<span class="string">"Labels ready"</span>)
 </pre>
 <h2 id="5">Var PCA plot</h2>
 <pre class="codeinput">X = preprocess2D(data_filtered, <span class="string">'Preprocessing'</span>, 1);
-<span class="comment">% varPca(X, "PCs", 1:10, "Preprocessing", 0, "PlotCkf", true);</span>
+varPca(X, <span class="string">"PCs"</span>, 1:10, <span class="string">"Preprocessing"</span>, 0, <span class="string">"PlotCkf"</span>, true);
 </pre>
-<h2 id="6">Model</h2>
+<img vspace="5" hspace="5" src="EEG_01.png" alt=""> <h2 id="6">Model</h2>
 <pre class="codeinput">model.lvs=1:2;
 model = pcaEig(X,<span class="string">'PCs'</span>,model.lvs);
 model.var = trace(X'*X);
 </pre>
-<h2 id="7">Scores plot</h2>
+<img vspace="5" hspace="5" src="EEG_02.png" alt=""> <h2 id="7">Scores plot</h2>
 <pre class="codeinput">disp(<span class="string">"Plotting scores..."</span>)
 scores(model, <span class="string">"ObsLabel"</span>, times_label, <span class="string">"ObsClass"</span>, times_label, <span class="string">"Color"</span>, <span class="string">"parula"</span>); title(<span class="string">"Time"</span>);
 <span class="comment">% scores(model, "ObsLabel", subjects_label, "ObsClass", subjects_label, "Color", "parula"); title("Subjects");legend('off');</span>
@@ -178,7 +178,7 @@ scores(model, <span class="string">"ObsLabel"</span>, operations_label, <span cl
 </pre>
 <pre class="codeoutput">Plotting scores...
 </pre>
-<img vspace="5" hspace="5" src="EEG_01.png" alt=""> <img vspace="5" hspace="5" src="EEG_02.png" alt=""> <h2 id="8">Loadings plots</h2>
+<img vspace="5" hspace="5" src="EEG_03.png" alt=""> <img vspace="5" hspace="5" src="EEG_04.png" alt=""> <img vspace="5" hspace="5" src="EEG_05.png" alt=""> <h2 id="8">Loadings plots</h2>
 <pre class="codeinput">disp(<span class="string">"Plotting loadings..."</span>)
 loadings(model, <span class="string">"VarsLabel"</span>, subjects_label, <span class="string">"VarsClass"</span>, subjects_label); title(<span class="string">"Subjects"</span>);
 loadings(model, <span class="string">"VarsLabel"</span>, channels_label, <span class="string">"VarsClass"</span>, channels_label, <span class="string">'Color'</span>, <span class="string">'parula'</span>); title(<span class="string">"Channels"</span>);
@@ -186,7 +186,7 @@ loadings(model, <span class="string">"VarsLabel"</span>, freqs_label, <span clas
 </pre>
 <pre class="codeoutput">Plotting loadings...
 </pre>
-<img vspace="5" hspace="5" src="EEG_03.png" alt=""> <img vspace="5" hspace="5" src="EEG_04.png" alt=""> <img vspace="5" hspace="5" src="EEG_05.png" alt=""> <img vspace="5" hspace="5" src="EEG_06.png" alt=""> <img vspace="5" hspace="5" src="EEG_07.png" alt=""> <h2 id="9">oMEDA: Baseline vs. Arithmetic</h2>
+<img vspace="5" hspace="5" src="EEG_06.png" alt=""> <img vspace="5" hspace="5" src="EEG_07.png" alt=""> <img vspace="5" hspace="5" src="EEG_08.png" alt=""> <img vspace="5" hspace="5" src="EEG_09.png" alt=""> <h2 id="9">oMEDA: Baseline vs. Arithmetic</h2>
 <p>Baseline: -1 | Arithmetic: +1</p>
 <pre class="codeinput">dummy = ones(size(operations_label));
 idx = (operations == 0);
@@ -212,7 +212,7 @@ omeda_vec = omeda(X, dummy, model.loads);
     <span class="keyword">end</span>
 <span class="keyword">end</span>
 </pre>
-<img vspace="5" hspace="5" src="EEG_08.png" alt=""> <img vspace="5" hspace="5" src="EEG_09.png" alt=""> <img vspace="5" hspace="5" src="EEG_10.png" alt=""> <img vspace="5" hspace="5" src="EEG_11.png" alt=""> <img vspace="5" hspace="5" src="EEG_12.png" alt=""> <img vspace="5" hspace="5" src="EEG_13.png" alt=""> <pre class="codeinput">
+<img vspace="5" hspace="5" src="EEG_10.png" alt=""> <img vspace="5" hspace="5" src="EEG_11.png" alt=""> <img vspace="5" hspace="5" src="EEG_12.png" alt=""> <img vspace="5" hspace="5" src="EEG_13.png" alt=""> <img vspace="5" hspace="5" src="EEG_14.png" alt=""> <img vspace="5" hspace="5" src="EEG_15.png" alt=""> <pre class="codeinput">
 <span class="keyword">if</span> true
     [~, idx] = sort(freqs_filtered);
     plotVec(omeda_vec(idx), <span class="string">'ObsClass'</span>, freqs_label(idx)); title(<span class="string">"oMEDA Baseline vs. Arithmetic: Frequencies"</span>)
@@ -222,7 +222,7 @@ omeda_vec = omeda(X, dummy, model.loads);
     plotVec(omeda_vec(idx), <span class="string">'ObsClass'</span>, subjects_label(idx)); title(<span class="string">"oMEDA Baseline vs. Arithmetic: Subjects"</span>)
 <span class="keyword">end</span>
 </pre>
-<img vspace="5" hspace="5" src="EEG_14.png" alt=""> <img vspace="5" hspace="5" src="EEG_15.png" alt=""> <img vspace="5" hspace="5" src="EEG_16.png" alt=""> <p class="footer">
+<img vspace="5" hspace="5" src="EEG_16.png" alt=""> <img vspace="5" hspace="5" src="EEG_17.png" alt=""> <img vspace="5" hspace="5" src="EEG_18.png" alt=""> <p class="footer">
 <br>
 <a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2025a</a>
 <br>
@@ -275,7 +275,7 @@ disp("Labels ready")
 
 %% Var PCA plot
 X = preprocess2D(data_filtered, 'Preprocessing', 1);
-% varPca(X, "PCs", 1:10, "Preprocessing", 0, "PlotCkf", true);
+varPca(X, "PCs", 1:10, "Preprocessing", 0, "PlotCkf", true);
 %% Model
 model.lvs=1:2;
 model = pcaEig(X,'PCs',model.lvs);

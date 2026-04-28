@@ -47,3 +47,4 @@ def test_unfold_2D_with_label_names():
     assert (labels_unfold[1][1] == ['burbuja', 'burbuja', 'cactus', 'cactus', 'pétalo', 'pétalo',
                                     'burbuja', 'burbuja', 'cactus', 'cactus', 'pétalo', 'pétalo']).all()
     assert (labels_unfold[1][2] == ['YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO']).all()
+
