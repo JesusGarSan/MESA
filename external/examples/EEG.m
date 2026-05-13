@@ -6,8 +6,8 @@ disp("Data size:")
 disp(size(data))
 
 %% Read labels
-row_label_names = strtrim(string(label_names{1}));
-col_label_names = strtrim(string(label_names{2}));
+row_label_names = strtrim(string(label_names(1,:)));
+col_label_names = strtrim(string(label_names(2,:)));
 
 % % (O*T, S*C*F)
 % % Rows
@@ -28,14 +28,42 @@ col_label_names = strtrim(string(label_names{2}));
 % channels = [var_l{1,:}];
 % freqs    = [var_l{2,:}];
 
-% (S*O*C, T*F)
+% % (S*O*C, T*F)
+% % Rows
+% subjects    = [obs_l{1,:}];
+% operations  = [obs_l{2,:}];
+% channels    = [obs_l{3,:}];
+% % Cols
+% freqs    = [var_l{1,:}];
+% times = [var_l{2,:}];
+
+% % (S*O, C*T*F)
+% % Rows
+% subjects    = [obs_l{1,:}];
+% operations  = [obs_l{2,:}];
+% % Cols
+% channels    = [var_l(1,:)];
+% freqs       = [var_l{2,:}];
+% times       = [var_l{3,:}];
+
+% (S*O, T*F) % Collapsed channels
 % Rows
 subjects    = [obs_l{1,:}];
 operations  = [obs_l{2,:}];
-channels       = [obs_l{3,:}];
 % Cols
-freqs    = [var_l{1,:}];
-times = [var_l{2,:}];
+channels    = [];
+freqs       = [var_l{1,:}];
+times       = [var_l{2,:}];
+
+
+% % (S*O, F) % Collapsed channels and time
+% % Rows
+% subjects    = [obs_l{1,:}];
+% operations  = [obs_l{2,:}];
+% % Cols
+% channels    = [];
+% freqs       = [var_l{1,:}];
+% times       = [];
 %% Filter frequencies
 data_filtered = data;
 
@@ -44,8 +72,8 @@ operations_filtered = operations;
 channels_filtered = channels;
 freqs_filtered = freqs;
 times_filtered = times;
-if true
-    idx = freqs <= 15; %Hz
+if false
+    idx = (freqs <= 15) && (freqs > 0.5); %Hz
     data_filtered = data_filtered(:,idx);
     % Cols
     if sum("subjects" == col_label_names)
@@ -66,54 +94,64 @@ disp(size(data_filtered))
 %% Decorate labels
 subjects_label = "subject " + subjects_filtered;
 operations_label = string(categorical(operations_filtered, [0, 1], {'Baseline', 'Arithmetic'}));
-channels_label = "channel " + channels_filtered;
+channels_label = channels_filtered;
 freqs_label = freqs_filtered;
 times_label = times_filtered;
 
 disp("Labels ready")
 
-%% Var PCA plot
+%% Preprocess
 X = preprocess2D(data_filtered, 'Preprocessing', 1);
-varPca(X, "PCs", 1:10, "Preprocessing", 0, "PlotCkf", true);
-%% Model
-model.lvs=1:2;
-model = pcaEig(X,'PCs',model.lvs);
-model.var = trace(X'*X);
-%% Scores plot
-disp("Plotting scores...")
-if sum("subjects" == row_label_names)
-    scores(model, "ObsLabel", subjects_label, "ObsClass", subjects_label, "Color", "parula"); title("Subjects");legend('off');
-end
-if sum("operations" == row_label_names)
-    scores(model, "ObsLabel", operations_label, "ObsClass", operations_label, "Color", "parula"); title("Operations");
-end
-if sum("channels" == row_label_names)
-    scores(model, "ObsLabel", channels_label, "ObsClass", channels_label, 'Color', 'parula'); title("Channels");legend('off')
-end
-if sum("freq" == row_label_names)
-    scores(model, "ObsLabel", freqs_label, "ObsClass", freqs_label, 'Color', 'parula'); title("Frequencies");
-end
-if sum("time" == row_label_names)
-    scores(model, "ObsLabel", times_label, "ObsClass", times_label, "Color", "parula"); title("Time");
-end
+%% Var PCA plot
+% plot_pca = false;
+% if plot_pca
+%     varPca(X, "PCs", 1:10, "Preprocessing", 0, "PlotCkf", true);
+% end
+% %% Model
+% if plot_pca
+%     model.lvs=1:2;
+%     model = pcaEig(X,'PCs',model.lvs);
+%     model.var = trace(X'*X);
+% end
+% %% Scores plot
+% if plot_pca
+%     disp("Plotting scores...")
+%     if sum("subjects" == row_label_names)
+%         scores(model, "ObsLabel", subjects_label, "ObsClass", subjects_label, "Color", "parula"); title("Subjects");legend('off');
+%     end
+%     if sum("operations" == row_label_names)
+%         scores(model, "ObsLabel", operations_label, "ObsClass", operations_label, "Color", "parula"); title("Operations");
+%     end
+%     if sum("channels" == row_label_names)
+%         scores(model, "ObsLabel", channels_label, "ObsClass", channels_label, 'Color', 'parula'); title("Channels");legend('off')
+%     end
+%     if sum("freq" == row_label_names)
+%         scores(model, "ObsLabel", freqs_label, "ObsClass", freqs_label, 'Color', 'parula'); title("Frequencies");
+%     end
+%     if sum("time" == row_label_names)
+%         scores(model, "ObsLabel", times_label, "ObsClass", times_label, "Color", "parula"); title("Time");
+%     end
+% end
 
-%% Loadings plots
-disp("Plotting loadings...")
-if sum("subjects" == col_label_names)
-    loadings(model, "VarsLabel", subjects_label, "VarsClass", subjects_label, "Color", "parula"); title("Subjects");legend('off');
-end
-if sum("operations" == col_label_names)
-    loadings(model, "VarsLabel", operations_label, "VarsClass", operations_label, "Color", "parula"); title("Operations");
-end
-if sum("channels" == col_label_names)
-    loadings(model, "VarsLabel", channels_label, "VarsClass", channels_label, 'Color', 'parula'); title("Channels");legend('off')
-end
-if sum("freq" == col_label_names)
-    loadings(model, "VarsLabel", freqs_label, "VarsClass", freqs_label, 'Color', 'parula'); title("Frequencies");
-end
-if sum("time" == col_label_names)
-    loadings(model, "VarsLabel", times_label, "VarsClass", times_label, "Color", "parula"); title("Time");
-end
+% %% Loadings plots
+% if plot_pca
+%     disp("Plotting loadings...")
+%     if sum("subjects" == col_label_names)
+%         loadings(model, "VarsLabel", subjects_label, "VarsClass", subjects_label, "Color", "parula"); title("Subjects");legend('off');
+%     end
+%     if sum("operations" == col_label_names)
+%         loadings(model, "VarsLabel", operations_label, "VarsClass", operations_label, "Color", "parula"); title("Operations");
+%     end
+%     if sum("channels" == col_label_names)
+%         loadings(model, "VarsLabel", channels_label, "VarsClass", channels_label, 'Color', 'parula'); title("Channels");legend('off')
+%     end
+%     if sum("freq" == col_label_names)
+%         loadings(model, "VarsLabel", freqs_label, "VarsClass", freqs_label, 'Color', 'parula'); title("Frequencies");
+%     end
+%     if sum("time" == col_label_names)
+%         loadings(model, "VarsLabel", times_label, "VarsClass", times_label, "Color", "parula"); title("Time");
+%     end
+% end
 %%
 
 % %% oMEDA: Baseline vs. Arithmetic
@@ -152,14 +190,13 @@ end
 % end
 
 
-
 %% ASCA 
 %% parglm
 disp("Running parglm...")
-F = [subjects; operations; channels]';
-[T, parglmo] = parglm(X, F, 'Preprocessing', 0);
+F = [subjects; operations]';
+[T, parglmo] = parglm(data_filtered, F, 'Preprocessing', 1);
 
-for i=1:size(row_label_names, 1)
+for i=1:size(row_label_names, 2)
     T{i,1} = {char(row_label_names(i))};
 end
 disp(T)
@@ -168,39 +205,83 @@ disp("Creating ASCA model...")
 ascao = asca(parglmo);
 %% ASCA Visualization - Scores
 disp("Plotting ASCA scores...")
+for factor_id = 1:ascao.nFactors
+    factor_name = string(row_label_names(factor_id));
+    factor_model = ascao.factors{factor_id};
 
-factor_model = ascao.factors{2};
-lvs = min([max(factor_model.lvs), 2]);
-factor_model.lvs = 1:lvs;
-if sum("subjects" == row_label_names)
-    scores(factor_model, "ObsLabel", subjects_label, "ObsClass", subjects_label, "Color", "okabeIto"); title("ASCA - Subjects");legend('off');
-end
-if sum("operations" == row_label_names)
-    scores(factor_model, "ObsLabel", operations_label, "ObsClass", operations_label, "Color", "parula"); title("ASCA - Operations");
-end
-if sum("channels" == row_label_names)
-    scores(factor_model, "ObsLabel", channels_label, "ObsClass", channels_label, 'Color', 'parula'); title("ASCA - Channels");legend('off')
-end
-if sum("freq" == row_label_names)
-    scores(factor_model, "ObsLabel", freqs_label, "ObsClass", freqs_label, 'Color', 'parula'); title("ASCA - Frequencies");
-end
-if sum("time" == row_label_names)
-    scores(factor_model, "ObsLabel", times_label, "ObsClass", times_label, "Color", "parula"); title("ASCA - Time");
+    lvs = min([max(factor_model.lvs), 2]);
+    factor_model.lvs = 1:lvs;
+
+    if factor_name == "subjects"
+        scores(factor_model, "ObsLabel", subjects_label, "ObsClass", subjects_label, "Color", "okabeIto", "BlurIndex", 0.1); title("Factor " + factor_name + " Scores - Color: Subjects");legend('off');
+    end
+    if factor_name == "operations"
+        scores(factor_model, "ObsLabel", subjects_label, "ObsClass", operations_label, "Color", "parula"); title("Factor " + factor_name + " Scores - Color: Operations");
+    end
+    if factor_name == "channels"
+        scores(factor_model, "ObsLabel", channels_label, "ObsClass", channels_label, 'Color', 'parula'); title("Factor " + factor_name + " Scores - Color: Channels");legend('off')
+    end
+    if factor_name == "freq"
+        scores(factor_model, "ObsLabel", freqs_label, "ObsClass", freqs_label, 'Color', 'parula'); title("Factor " + factor_name + " Scores - Color: Frequencies");
+    end
+    if factor_name == "time"
+        scores(factor_model, "ObsLabel", times_label, "ObsClass", times_label, "Color", "parula"); title("Factor " + factor_name + " Scores - Color: Time");
+    end
 end
 %% ASCA Visualization - Loadings
 disp("Plotting ASCA loadings...")
-if sum("subjects" == col_label_names)
-    loadings(factor_model, "VarsLabel", subjects_label, "VarsClass", subjects_label, "Color", "parula"); title("ASCA - Subjects");legend('off');
-end
-if sum("operations" == col_label_names)
-    loadings(factor_model, "VarsLabel", operations_label, "VarsClass", operations_label, "Color", "parula"); title("ASCA - Operations");
-end
-if sum("channels" == col_label_names)
-    loadings(factor_model, "VarsLabel", channels_label, "VarsClass", channels_label, 'Color', 'parula'); title("ASCA - Channels");legend('off')
-end
-if sum("freq" == col_label_names)
-    loadings(factor_model, "VarsLabel", freqs_label, "VarsClass", freqs_label, 'Color', 'parula'); title("ASCA - Frequencies");
-end
-if sum("time" == col_label_names)
-    loadings(factor_model, "VarsLabel", times_label, "VarsClass", times_label, "Color", "parula"); title("ASCA - Time");
+for factor_id = 1:ascao.nFactors
+    factor_name = string(row_label_names(factor_id));
+    factor_model = ascao.factors{factor_id};
+    
+    lvs = min([max(factor_model.lvs), 2]);
+    factor_model.lvs = 1:lvs;
+    aux = factor_model;
+
+
+    if sum("subjects" == col_label_names)
+        [~, idx] = sort(subjects_label);
+        labels = subjects_label(idx)';
+        classes = subjects_label(idx);
+        title_label = "Subjects";
+        aux.loads = aux.loads(idx, :);
+        loadings(aux, "VarsLabel", labels, "VarsClass", classes, "Color", "parula"); title("Factor " + factor_name + " Loadings - Color: " + title_label);legend('off');
+
+    end
+    if sum("operations" == col_label_names)
+        [~, idx] = sort(operations_label);
+        labels = subjects_label(idx);
+        classes = operations_label(idx);
+        title_label = "Operations";
+        aux.loads = aux.loads(idx, :);
+        loadings(aux, "VarsLabel", labels, "VarsClass", classes, "Color", "parula"); title("Factor " + factor_name + " Loadings - Color: " + title_label);legend('off');
+
+    end
+    if sum("channels" == col_label_names)
+        [~, idx] = sort(channels_label);
+        labels = channels_label(idx);
+        classes = channels_label(idx);
+        title_label = "Channels";
+        aux.loads = aux.loads(idx, :);
+        loadings(aux, "VarsLabel", labels, "VarsClass", classes, "Color", "parula"); title("Factor " + factor_name + " Loadings - Color: " + title_label);legend('off');
+
+    end
+    if sum("freq" == col_label_names)
+        [~, idx] = sort(freqs_label);
+        labels = freqs_label(idx);
+        classes = freqs_label(idx);
+        title_label = "Frequencies";
+        aux.loads = aux.loads(idx, :);
+        loadings(aux, "VarsLabel", labels, "VarsClass", classes, "Color", "parula"); title("Factor " + factor_name + " Loadings - Color: " + title_label);legend('off');
+
+    end
+    if sum("time" == col_label_names)
+        [~, idx] = sort(times_label);
+        labels = times_label(idx);
+        classes = times_label(idx);
+        title_label = "Time";
+        aux.loads = aux.loads(idx, :);
+        loadings(aux, "VarsLabel", labels, "VarsClass", classes, "Color", "parula"); title("Factor " + factor_name + " Loadings - Sort: " + title_label);legend('off');
+    end
+
 end
