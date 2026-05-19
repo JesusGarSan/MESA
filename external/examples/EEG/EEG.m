@@ -1,6 +1,6 @@
 %% load data
 close all; clear; clc
-load external/examples/EEG.mat
+load external/examples/EEG/EEG.mat
 
 disp("Data size:")
 disp(size(data))
