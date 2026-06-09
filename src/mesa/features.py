@@ -69,7 +69,7 @@ def stft(signal:np.array, win_length:int, hop:int = None, n_fft:int = None,
     if freq_decimation: # Decimate the freq resolution as desired
         current_bins = D.shape[-2]
         desired_bins = 1 + requested_n_fft // 2
-        k = current_bins // desired_bins
+        k = (current_bins+1) // desired_bins
 
         if k > 1:
             if freq_decimation_method == "drop_value": # Keep one out of every k elements

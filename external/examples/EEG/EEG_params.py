@@ -51,7 +51,7 @@ def run_stft_parglm_pipeline(Y, channels, window_sec, hop_fraction, window_func)
     hop = int(window_length * hop_fraction)
     hop = max(1, hop)
 
-    D = stft(Y_resampled, window_length, hop, window=window_func, center=True, n_fft=n_fft)
+    D = stft(Y_resampled, window_length, hop, window=window_func, center=False, n_fft=n_fft)
     Sxx = librosa.amplitude_to_db(np.abs(D))
     times, freqs = stft_labels(D, sr, hop, n_fft=n_fft)
 
@@ -82,22 +82,22 @@ def run_stft_parglm_pipeline(Y, channels, window_sec, hop_fraction, window_func)
     
     return T["PercSumSq"][2], T["Pvalue"][2]
 
-def plot_heatmaps_shared_scale(csv_file, output_dir):
-    """Generates heatmaps with shared color scale and conditional formatting."""
+def plot_heatmaps(csv_file, output_dir, vmin=None, vmax=None, cutoff = 0, color_col = "PercSS"):
     df = pd.read_csv(csv_file)
     df['-log10(p)'] = -np.log10(df['p_value'] + 1e-15) # epsilon to avoid log(0)
     
     window_functions = df['window_function'].unique()
-    
-    # Calculate global min/max for PercSS to share color scale
-    vmin = df['PercSS'].min()
-    vmax = df['PercSS'].max()
 
+    if vmin is None:
+        vmin = df['PercSS'].min()
+    if vmax is None:
+        vmax = df['PercSS'].max()
+    
     for win in window_functions:
         subset = df[df['window_function'] == win]
         
         # Pivot data for heatmap and annotations
-        perc_pivot = subset.pivot(index="window_length", columns="hop_fraction", values="PercSS")
+        perc_pivot = subset.pivot(index="window_length", columns="hop_fraction", values=color_col)
         logp_pivot = subset.pivot(index="window_length", columns="hop_fraction", values="-log10(p)")
         
         # Create custom annotation matrix: "PercSS\n(-log10p)"
@@ -113,22 +113,24 @@ def plot_heatmaps_shared_scale(csv_file, output_dir):
         plt.figure(figsize=(12, 9))
         
         # Create a mask for cells where -log10(p) < 2
-        mask = logp_pivot < 2
+        mask = logp_pivot < cutoff
         
         # Plot heatmap. We use two layers: one for the grey background, one for data
         # Layer 1: Grey background for masked values
-        sns.heatmap(perc_pivot, mask=~mask, cmap=mcolors.ListedColormap(['#C0C0C0']), 
-                    cbar=False, annot=np.array(annot_matrix), fmt="", annot_kws={"color": "black"})
+        if ~(~mask.to_numpy() == True).all():
+            sns.heatmap(perc_pivot, mask=~mask, cmap=mcolors.ListedColormap(['#C0C0C0']), 
+                        cbar=False, annot=np.array(annot_matrix), fmt="", annot_kws={"color": "black"})
         
         # Layer 2: Main data with shared color scale
         sns.heatmap(perc_pivot, mask=mask, annot=np.array(annot_matrix), fmt="",
                     cmap="YlGnBu", vmin=vmin, vmax=vmax, cbar=True)
 
-        plt.title(f'PercSS and -log10(p) | Window: {win}\n(Grey cells indicate -log10(p) < 2)')
+        # plt.title(f'PercSS and -log10(p) | Window: {win})\n(Grey cells indicate -log10(p) < 2)')
+        plt.title(f'PercSS and -log10(p) | Window: {win})')
         plt.xlabel('Hop Fraction')
         plt.ylabel('Window Length (s)')
 
-        plot_path = os.path.join(output_dir, f'eeg_heatmap_{win}.png')
+        plot_path = os.path.join(output_dir, f'eeg_heatmap_{color_col}_{win}.png')
         plt.savefig(plot_path)
         plt.close()
         print(f"Saved heatmap for {win} to {plot_path}")
@@ -141,31 +143,36 @@ if __name__ == "__main__":
     Y_raw, _, channels_list = load_eeg_data()
     results = []
 
-    print(f"\nStarting parameter sweep...")
-    print(f"{'Win Fnc':<10} | {'Win (s)':<8} | {'Hop':<6} | {'PercSS':<10} | {'p-value':<10}")
-    print("-" * 60)
-
-    for wf in window_functions:
-        for w in windows_sec:
-            for h in hops_fraction:
-                try:
-                    percss, p_val = run_stft_parglm_pipeline(Y_raw, channels_list, w, h, wf)
-                    results.append({
-                        "window_function": wf,
-                        "window_length": w,
-                        "hop_fraction": h,
-                        "PercSS": percss,
-                        "p_value": p_val
-                    })
-                    print(f"{wf:<10} | {w:<8.2f} | {h:<6.2f} | {percss:<10.6f} | {p_val:<10.4e}")
-                except Exception as e:
-                    print(f"Error in {wf} W:{w}, H:{h} -> {e}")
-
     output_path = "external/examples/EEG/"
-    os.makedirs(output_path, exist_ok=True)
-    
     csv_file = os.path.join(output_path, "eeg_params.csv")
-    pd.DataFrame(results).to_csv(csv_file, index=False)
     
-    print(f"\nResults saved to {csv_file}")
-    plot_heatmaps_shared_scale(csv_file, output_path)
+    compute = True
+    if compute:
+        print(f"\nStarting parameter sweep...")
+        print(f"{'Win Fnc':<10} | {'Win (s)':<8} | {'Hop':<6} | {'PercSS':<10} | {'p-value':<10}")
+        print("-" * 60)
+
+        for wf in window_functions:
+            for w in windows_sec:
+                for h in hops_fraction:
+                    try:
+                        percss, p_val = run_stft_parglm_pipeline(Y_raw, channels_list, w, h, wf)
+                        results.append({
+                            "window_function": wf,
+                            "window_length": w,
+                            "hop_fraction": h,
+                            "PercSS": percss,
+                            "p_value": p_val
+                        })
+                        print(f"{wf:<10} | {w:<8.2f} | {h:<6.2f} | {percss:<10.6f} | {p_val:<10.4e}")
+                    except Exception as e:
+                        print(f"Error in {wf} W:{w}, H:{h} -> {e}")
+
+        os.makedirs(output_path, exist_ok=True)
+        
+        pd.DataFrame(results).to_csv(csv_file, index=False)
+        
+        print(f"\nResults saved to {csv_file}")
+
+    plot_heatmaps(csv_file, output_path, vmin = 0, cutoff=0, color_col="PercSS")
+    plot_heatmaps(csv_file, output_path, vmin = 0, cutoff=0, color_col="-log10(p)")

@@ -5,4 +5,4 @@ obspy
 scikit-learn
 librosa
 git+https://github.com/CoDaSLab/MSPC_PCA-based.git#egg=mspc-pca
-
+git+https://github.com/mdarmstr/parglm_torch.git@4fa3e5508ccaa85576de1fcb00058bc3133aef24
