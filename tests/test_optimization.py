@@ -1,5 +1,8 @@
-from mesa.optimization import pipeline_iterator
+from mesa.optimization import pipeline_iterator, plot_heatmaps
 import os
+
+output_file = "tests/test_pipeline_iterator_dummy_script_test_file.csv"
+print(os.getcwd())
 
 def test_pipeline_iterator_dummy_script():
     parameters = {
@@ -9,9 +12,17 @@ def test_pipeline_iterator_dummy_script():
     }
     def function(param_a, param_b, param_c):
         return {"SS": 0.99, "p": 0.05, "unexpected_metric": 12.3}
-    
-    output_file = "external/tests/test_pipeline_iterator_dummy_script_test_file.csv"
-    pipeline_iterator(parameters, function, output_file)
-    os.remove(output_file)
 
+    pipeline_iterator(parameters, function, output_file)
     return
+
+def test_optimization_heatmap(): # Provide a dummy .csv file for testing
+    plot_heatmaps(output_file,
+                'param_a',
+                'param_b',
+                'param_c',
+                ["SS", "p"], vmin=0, vmax=1, cmap='YlGnBu')
+    return
+
+# if os.path.exists(output_file):
+#     os.remove(output_file)

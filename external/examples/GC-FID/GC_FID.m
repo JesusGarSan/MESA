@@ -5,7 +5,7 @@ load external/examples/GC-FID/GC-FID.mat
 
 % disp("Data size:")
 % disp(size(data))
-plot_bool = false;
+plot_bool = true;
 
 %% Read labels
 row_label_names = strtrim(string(label_names(:,1)));
@@ -79,22 +79,22 @@ if plot_bool
 end
 
 %% ASCA Visualization - Loadings
-if plot_bool
-    disp("Plotting ASCA loadings...")
-    % for factor_id = 1:ascao.nFactors
-    for factor_id = 1:1
-        % factor_name = string(row_label_names(factor_id));
-        factor_name = factor_names{factor_id};
-        factor_model = ascao.factors{factor_id};
+% if plot_bool
+%     disp("Plotting ASCA loadings...")
+%     % for factor_id = 1:ascao.nFactors
+%     for factor_id = 1:1
+%         % factor_name = string(row_label_names(factor_id));
+%         factor_name = factor_names{factor_id};
+%         factor_model = ascao.factors{factor_id};
 
-        lvs = min([max(factor_model.lvs), 2]);
-        factor_model.lvs = 1:lvs;
-        class = F(:,factor_id);
+%         lvs = min([max(factor_model.lvs), 2]);
+%         factor_model.lvs = 1:lvs;
+%         class = F(:,factor_id);
 
-        loadings(factor_model, "VarsLabel", times, "VarsClass", times, "Color", "parula"); title("Factor " + factor_name + " Scores - Color: Time");
-        loadings(factor_model, "VarsLabel", freqs, "VarsClass", freqs, "Color", "parula"); title("Factor " + factor_name + " Scores - Color: Frequencies");
-    end
-end
+%         loadings(factor_model, "VarsLabel", times, "VarsClass", times, "Color", "parula"); title("Factor " + factor_name + " Scores - Color: Time");
+%         loadings(factor_model, "VarsLabel", freqs, "VarsClass", freqs, "Color", "parula"); title("Factor " + factor_name + " Scores - Color: Frequencies");
+%     end
+% end
 %%
 SS_time      = T{2,3};
 SS_treatment = T{3,3};
@@ -133,30 +133,3 @@ T
 % end
 
 % %%
-
-%%
-%% --- APPEND RESULTS TO OPTIMIZATION CSV ---
-% Read environment variables passed by the Bash script
-window_length = getenv('OPT_WINDOW_LENGTH');
-hop           = getenv('OPT_HOP');
-window        = getenv('OPT_WINDOW');
-
-signal_length = 45001;
-window_length;
-window_length_fraction = str2num(window_length)/signal_length;
-hop_fraction = str2num(hop)/str2num(window_length);
-
-% Create row data array
-row_data = {window_length_fraction, hop_fraction, window, SS_time, SS_treatment, SS_sex, SS_order, SS_residuals, p_time, p_treatment, p_sex, p_order};
-
-% Write to file (create with header if it doesn't exist)
-csv_file = 'optimization.csv';
-if ~exist(csv_file, 'file')
-    header = {'window_length_fraction', 'hop_fraction', 'window', 'SS_time', 'SS_treatment', 'SS_sex', 'SS_order', 'SS_residuals', 'p_time', 'p_treatment', 'p_sex', 'p_order'};
-    writecell([header; row_data], csv_file);
-else
-    writecell(row_data, csv_file, 'WriteMode', 'append');
-end
-
-disp('Results successfully logged to optimization.csv');
-% exit; % Automatically close MATLAB to let Bash continue the loop
