@@ -1,30 +1,12 @@
 %% load data
 disp('Running GC_FID.m ...')
 close all; clear; clc
-load external/examples/GC-FID/GC-FID.mat
+load external/examples/GC-FID/GC-FID_peaks.mat
 
 % disp("Data size:")
 % disp(size(data))
 plot_bool = true;
 
-%% Read labels
-row_label_names = strtrim(string(label_names(:,1)));
-col_label_names = strtrim(string(label_names{:,2}));
-
-% (S, T*F)
-% Rows
-subjects    = [obs_l{1,:}];
-% Cols
-times = [];
-freqs       = [var_l{1,:}];
-times       = [var_l{2,:}];
-
-%% Decorate labels
-subjects_label = "subject " + subjects;
-freqs_label = freqs;
-times_label = times;
-
-% disp("Labels ready")
 
 %% Preprocess
 % X = preprocess2D(data','Preprocessing', 2)';
@@ -39,7 +21,7 @@ disp("Running parglm...")
 % F = [subjects];
 F = F_data;
 % [T, parglmo] = parglm(X, F, 'Preprocessing', 1, 'Model', {[1,2]});
-[T, parglmo] = parglm(X, F, 'Preprocessing', 2, 'Model', 'linear');
+[T, parglmo] = parglm(X, F, 'Preprocessing', 1, 'Model', 'linear');
 
 factor_names = ["Time", "Treatment", "Sex", "Order"];
 % T{2,1} = {'Time'};        % How long after they were treated

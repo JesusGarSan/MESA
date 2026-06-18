@@ -163,7 +163,7 @@ def plot_heatmaps(
                 index=y_axis, columns=x_axis, values=metric
             )
 
-            plt.figure(figsize=(8, 6))
+            fig, ax = plt.subplots(1,1, figsize=(12, 6))
             
             # Pass cmap, vmin, and vmax dynamically to seaborn
             sns.heatmap(
@@ -179,12 +179,17 @@ def plot_heatmaps(
             plt.xlabel(x_axis)
             plt.ylabel(y_axis)
 
+            # Temp. Comment out or delete
+            ax.set_title("F statistic: Factor Time\nwindow function: boxcar", fontsize  = 16)
+            ax.set_xlabel("Hop fraction", fontsize = 16)    
+            ax.set_ylabel("Window length fraction", fontsize = 16)    
+
             output_image_path = f"{base_name}_{group_string}_{metric}.png"
 
             plt.savefig(output_image_path, dpi=300, bbox_inches="tight")
             plt.close()
 
-    return
+    return fig
 
 if __name__ == "__main__":
 

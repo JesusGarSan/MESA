@@ -103,9 +103,12 @@ def main(window_length_fraction=None, hop_fraction=None, window_function="boxcar
     subjects = np.arange(96) + 1
     labels = [subjects, freqs, times]
     label_names = ["subjects", "freq", "time"]
+
     X_unfold, labels_unfold, label_names = unfold_2D(
         Sxx, rows=[0], cols=[1, 2], labels=labels, label_names=label_names
     )
+    # print(Sxx.shape)
+    # print(X_unfold.shape)
     
     # %% Save the data
     path = "external/examples/GC-FID/GC-FID.mat"
@@ -124,4 +127,7 @@ def main(window_length_fraction=None, hop_fraction=None, window_function="boxcar
 
 
 if __name__ == "__main__":
-    main(0.01, 1, 'boxcar')
+    main(0.01, 0.50, 'boxcar') # "optimal"
+    # main(0.25, 0.50   , 'boxcar') # sub-opimal
+    # main(0.0025, 0.50, 'boxcar') # overdone
+    # main(1.00, 1.00   , 'boxcar') # FFT limit case
