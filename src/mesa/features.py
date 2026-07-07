@@ -9,7 +9,7 @@ from typing import Literal
 def stft(signal: np.ndarray, win_length: int, hop: int = None, n_fft: int = None,
          window: str | tuple | np.ndarray = "blackman", center: bool = False,
          freq_decimation_method: Literal["drop_value", "average"] = "drop_value",
-         demean_slices: bool = True):
+         demean_slices: bool = False):
     
     if hop is None:
         hop = win_length  # No overlap
