@@ -77,8 +77,8 @@ if plot_bool
         ax = gca;   
         if factor_id ==1
             lgd = legend("24h", "72h");
-            set(gcf, 'Position', [100, 100, 1200, 450]);    
-            title("Factor Time Scores")
+            set(gcf, 'Position', [100, 100, 1100, 450]);    
+            title("Factor Inoculation Scores")
             ax.Box = "off";                           
         end
         if factor_id ==2
@@ -122,7 +122,48 @@ p_sex       = T{4,7};
 p_order     = T{5,7};
 
 %%
+distances = zeros(ascao.nFactors, 1);
+for factor_id = 1:ascao.nFactors
+    classes = F(:,factor_id);
+    levels = unique(classes);
+    
+    pcs = max(ascao.factors{factor_id}.lvs);
+    means = zeros(length(levels), pcs);
+    for level_id = 1:size(levels,1)
+        idx = (classes == levels(level_id));
+        values = ascao.factors{factor_id}.scores(idx,:);
+        means(level_id,:) = mean(values);
+    end
+
+    distance = 0;
+    num_groups = size(means, 1);
+    
+    % Doble bucle para comparar cada grupo con los siguientes
+    for i = 1:num_groups - 1
+        for j = i + 1:num_groups
+            % Calcula la distancia euclidiana entre la media del grupo i y el grupo j
+            diff = means(i, :) - means(j, :);
+            dist_ij = sqrt(sum(abs(diff).^2)); 
+            
+            % Acumula la distancia
+            distance = distance + dist_ij;
+        end
+    end
+    distances(factor_id) = distance;
+
+end
+
+dist_time = distances(1);
+dist_treatment = distances(2);
+dist_sex = distances(3);
+dist_order = distances(4);
+
+
+%%
 T
+
+%% Null factor
+
 
 % %% Peak table
 % [T_peak, parglmo_peak] = parglm(X_peak, F_peak, 'Preprocessing', 1, 'Model', {[1,2]});

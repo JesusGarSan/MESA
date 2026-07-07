@@ -12,7 +12,7 @@ from airPLS import airPLS
 from mesa.fusion import unfold_2D
 
 
-def main(window_length_fraction=None, hop_fraction=None, window_function="boxcar"):
+def main(window_length_fraction=None, hop_fraction=None, window_function="boxcar", verbose = False):
     # Determine window_length from fraction or fallback to CLI/default
     signal_length = 45001
     
@@ -52,7 +52,11 @@ def main(window_length_fraction=None, hop_fraction=None, window_function="boxcar
     F_data = pd.read_csv("external/data/GC-FID/Y_data.csv", header=None)
     F_data_matrix = F_data.to_numpy()
 
-    idx = np.where(np.sum(F_data_matrix, axis=1) == 0)
+    # Add null factor for overfitting testing
+    null = np.floor(np.random.rand(96+8,1)*4)
+    F_data_matrix = np.hstack((F_data_matrix, null))
+
+    idx = np.where(np.sum(F_data_matrix[:,0:3], axis=1) == 0)
     idx_blank_24h = [0, 1, 2, 3]
     idx_blank_72h = [52, 53, 54, 55]
 
@@ -99,10 +103,20 @@ def main(window_length_fraction=None, hop_fraction=None, window_function="boxcar
         Sxx = np.delete(Sxx, idx, axis=0)
         F_data_matrix = np.delete(F_data_matrix, idx, axis=0)
 
+    if verbose:
+        print(f"Total samples: {F_data_matrix.shape[0]}")
+        # Time, treatment, sex, order, null
+        from collections import Counter
+        print(f"Inoculation time levels: {dict(Counter(F_data_matrix[:,0].astype(int)))}") 
+        print(f"Treatment levels:        {dict(Counter(F_data_matrix[:,1].astype(int)))}") 
+        print(f"Sex levels:              {dict(Counter(F_data_matrix[:,2].astype(int)))}") 
+        print(f"Order levels:            {dict(Counter(F_data_matrix[:,3].astype(int)))}") 
+        print(f"Null levels:             {dict(Counter(F_data_matrix[:,4].astype(int)))}") 
     # %% Unfolding
     subjects = np.arange(96) + 1
     labels = [subjects, freqs, times]
     label_names = ["subjects", "freq", "time"]
+
 
     X_unfold, labels_unfold, label_names = unfold_2D(
         Sxx, rows=[0], cols=[1, 2], labels=labels, label_names=label_names
@@ -127,7 +141,8 @@ def main(window_length_fraction=None, hop_fraction=None, window_function="boxcar
 
 
 if __name__ == "__main__":
-    main(0.01, 0.50, 'boxcar') # "optimal"
+    main(0.1, 0.5, 'boxcar', verbose = True) # "test"
+    # main(0.01, 0.50, 'boxcar') # "optimal"
     # main(0.25, 0.50   , 'boxcar') # sub-opimal
     # main(0.0025, 0.50, 'boxcar') # overdone
     # main(1.00, 1.00   , 'boxcar') # FFT limit case

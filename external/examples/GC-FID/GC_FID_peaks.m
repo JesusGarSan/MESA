@@ -59,8 +59,8 @@ if plot_bool
         ax = gca;   
         if factor_id ==1
             lgd = legend("24h", "72h");
-            set(gcf, 'Position', [100, 100, 1200, 450]);    
-            title("Factor Time Scores")
+            set(gcf, 'Position', [100, 100, 1100, 450]);    
+            title("Factor Inoculation Scores")
             ax.Box = "off";                           
         end
         if factor_id ==2

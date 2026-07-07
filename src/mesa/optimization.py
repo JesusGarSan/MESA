@@ -125,10 +125,14 @@ def plot_heatmaps(
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
     shared_colorbar: bool = True,
+    output_dir: str = "heatmaps",
 ):
+    
+    os.makedirs(output_dir, exist_ok=True)
+
     if isinstance(data, str):
         df = pd.read_csv(data)
-        base_name = os.path.splitext(data)[0]
+        base_name = os.path.splitext(os.path.basename(data))[0]
     elif isinstance(data, pd.DataFrame):
         df = data
         base_name = "heatmap"
@@ -163,7 +167,7 @@ def plot_heatmaps(
                 index=y_axis, columns=x_axis, values=metric
             )
 
-            fig, ax = plt.subplots(1,1, figsize=(12, 6))
+            fig, ax = plt.subplots(1,1, figsize=(12, 7))
             
             # Pass cmap, vmin, and vmax dynamically to seaborn
             sns.heatmap(
@@ -180,11 +184,12 @@ def plot_heatmaps(
             plt.ylabel(y_axis)
 
             # Temp. Comment out or delete
-            ax.set_title("F statistic: Factor Time\nwindow function: boxcar", fontsize  = 16)
-            ax.set_xlabel("Hop fraction", fontsize = 16)    
-            ax.set_ylabel("Window length fraction", fontsize = 16)    
+            # ax.set_title("Cluster centroid distance: Factor Treatment\nwindow function: hann", fontsize  = 16)
+            # ax.set_xlabel("Hop fraction", fontsize = 16)    
+            # ax.set_ylabel("Window length fraction", fontsize = 16)    
 
-            output_image_path = f"{base_name}_{group_string}_{metric}.png"
+            file_name = f"{base_name}_{group_string}_{metric}.png"
+            output_image_path = os.path.join(output_dir, file_name)
 
             plt.savefig(output_image_path, dpi=300, bbox_inches="tight")
             plt.close()
