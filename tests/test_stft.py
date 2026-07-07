@@ -32,3 +32,24 @@ def test_stft_labels():
     assert (times == np.array([0,0.2,0.4,0.6,0.8])).all()
     assert (freqs == np.array([0.0,5.0])).all()
 
+def test_stft_slice_demeaning():
+    sr = 100
+    y = np.ones(sr * 2) * 10.0 
+    win_length = 10
+    hop = 10
+
+    D_demeaned = stft(y, win_length=win_length, hop=hop, demean_slices=True)
+    D_normal   = stft(y, win_length=win_length, hop=hop, demean_slices=False)
+
+    zero_hz_demeaned = np.abs(D_demeaned[0, :])
+    zero_hz_normal = np.abs(D_normal[0, :])
+
+    assert np.all(zero_hz_normal > 1.0), "Sanity check failed: Normal STFT should capture the DC offset."
+
+    np.testing.assert_allclose(
+        zero_hz_demeaned, 
+        0.0, 
+        atol=1e-7, 
+        err_msg="Slice demeaning failed! The 0 Hz (DC) bin is not zero."
+    )
+

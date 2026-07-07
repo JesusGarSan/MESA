@@ -6,50 +6,13 @@ import numpy as np
 import librosa
 from typing import Literal
 
-def stft(signal:np.array, win_length:int, hop:int = None, n_fft:int = None,
-         window:str|tuple|np.ndarray="blackman", center:bool = False,
-         freq_decimation_method:Literal["drop_value","average"]="drop_value"):
-    """
-    Computes a Short-Time Fourier Transform (STFT) with custom frequency-axis decimation.
-
-    This function wraps librosa.stft. When n_fft < win_length, it bypasses the 
-    standard requirement by computing the STFT at full win_length resolution 
-    and then decimating the frequency axis according to the chosen method.
-
-    Parameters
-    ----------
-    signal : np.ndarray
-        The input audio signal (time series).
-    win_length : int
-        Number of samples per window.
-    hop : int, optional
-        Number of samples between successive frames. Defaults to win_length (0% overlap).
-    n_fft : int, optional
-        Desired number of FFT bins. If n_fft < win_length, decimation is performed.
-        Defaults to win_length.
-    window : str, tuple, or np.ndarray, optional
-        Window function to apply. Defaults to "blackman".
-    center : bool, optional
-        If True, pads the signal so frames are centered. If False, the first frame 
-        begins at t=0. Defaults to False.
-    freq_decimation_method : {"drop_value", "average"}, optional
-        Method used to reduce frequency resolution:
-        - "drop_value": Keeps 1 out of every k bins (stride-based slicing).
-        - "average": Averages blocks of k bins (spectral binning).
-
-    Returns
-    -------
-    D : np.ndarray
-        Complex-valued matrix of STFT coefficients. Shape: (1 + n_fft//2, t).
-
-    Notes
-    -----
-    The decimation factor k is determined by the ratio of bins produced by 
-    win_length vs n_fft. If the axis is not perfectly divisible by k, 
-    the trailing bins are cropped to maintain a consistent output shape.
-    """
+def stft(signal: np.ndarray, win_length: int, hop: int = None, n_fft: int = None,
+         window: str | tuple | np.ndarray = "blackman", center: bool = False,
+         freq_decimation_method: Literal["drop_value", "average"] = "drop_value",
+         demean_slices: bool = True):
+    
     if hop is None:
-        hop = win_length # No overlap
+        hop = win_length  # No overlap
 
     freq_decimation = False    
     requested_n_fft = n_fft
@@ -58,31 +21,43 @@ def stft(signal:np.array, win_length:int, hop:int = None, n_fft:int = None,
         n_fft = win_length
     elif n_fft < win_length:
         n_fft = win_length
-        freq_decimation = True # If a lower n_fft is desired, decimation will be performed
+        freq_decimation = True 
 
-    D = librosa.stft(signal,
-                win_length=win_length, hop_length=hop,
-                n_fft=n_fft,
-                window=window, center=center)
+    if center:
+        padding = [(0, 0)] * (signal.ndim - 1) + [(int(n_fft // 2), int(n_fft // 2))]
+        signal = np.pad(signal, padding, mode='reflect')
+        
+    frames = librosa.util.frame(signal, frame_length=n_fft, hop_length=hop, axis=-1)
     
+    if demean_slices:
+        frames = frames - np.mean(frames, axis=-2, keepdims=True)
+        
+    fft_window = librosa.filters.get_window(window, n_fft, fftbins=True)
+    
+    window_shape = [1] * frames.ndim
+    window_shape[-2] = n_fft
+    fft_window = fft_window.reshape(window_shape)
+    
+    windowed_frames = frames * fft_window
+    
+    D = np.fft.rfft(windowed_frames, axis=-2)
 
-    if freq_decimation: # Decimate the freq resolution as desired
+    if freq_decimation:  # Decimate the freq resolution as desired
         current_bins = D.shape[-2]
         desired_bins = 1 + requested_n_fft // 2
-        k = (current_bins+1) // desired_bins
 
-        if k > 1:
-            if freq_decimation_method == "drop_value": # Keep one out of every k elements
-                D = D[..., :desired_bins * k:k, :]
-                pass
-                
-            elif freq_decimation_method == "average": # Average every set of k elements
-                D = D[..., : (current_bins // k) * k, :]
-                new_shape = list(D.shape)
-                new_shape[-2] = new_shape[-2] // k
-                new_shape.insert(-1, k) 
-                D = D.reshape(new_shape).mean(axis=-2)
-                pass
+        if freq_decimation_method == "drop_value":
+            # Calculate stride k to yield exactly the number of desired bins
+            k = current_bins // desired_bins
+            idx = [slice(None)] * D.ndim
+            idx[-2] = slice(None, desired_bins * k, k)
+            D = D[tuple(idx)]
+            
+        elif freq_decimation_method == "average":
+            # Split the frequency axis into exactly 'desired_bins' groups
+            chunks = np.array_split(D, desired_bins, axis=-2)
+            # Average each group along the frequency axis and stack them back together
+            D = np.stack([chunk.mean(axis=-2) for chunk in chunks], axis=-2)
 
     return D
 
