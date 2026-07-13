@@ -94,6 +94,9 @@ def unfold_2D(X: np.ndarray, rows: list, cols: list, labels:list = None, label_n
     return X_permuted.reshape(row_size, col_size), labels_unfold, label_names_unfold
 
 
+import numpy as np
+from typing import Tuple, List
+
 def resample(
     X: np.ndarray, 
     axis: int, 
@@ -103,6 +106,7 @@ def resample(
 ) -> Tuple[np.ndarray, List[np.ndarray]]:
     """
     Resamples a data tensor along a specified axis by grouping adjacent values.
+    Optimized via vectorized sliding window views.
     """
     # --- 1. Validation Logic ---
     if not isinstance(X, np.ndarray):
@@ -131,19 +135,25 @@ def resample(
 
     # --- 2. Window Mapping & Index Extraction ---
     axis_len = X.shape[axis]
-    
-    # Generate the starting indices for each window
     start_indices = range(0, axis_len - slice_len + 1, slide)
     
-    # Map out the original IDs that make up each window
+    # Constructing output IDs (Kept list comprehension here to match your exact output signature)
     ids_resampled = [np.arange(start, start + slice_len) for start in start_indices]
-    
-    # If the slide/slice configuration doesn't fit any complete windows
     if not ids_resampled:
         raise ValueError("No complete windows can be formed with the given slice_len and slide.")
 
-    # --- 3. Reduction Processing ---
-    # Mapping string names to their respective math operations
+    # --- 3. Optimized Vectorized Reduction Processing ---
+    # 1. Create a memory-free sliding window view along the target axis
+    # This adds a new dimension at the very end of the shape representing the window elements
+    windows = np.lib.stride_tricks.sliding_window_view(X, window_shape=slice_len, axis=axis)
+    
+    # 2. Slice the view to apply your stride/slide setting
+    # We construct a dynamic slicing tuple: equivalent to windows[:, :, ::slide, :] for axis=2
+    indexer = [slice(None)] * windows.ndim
+    indexer[axis] = slice(None, None, slide)
+    strided_windows = windows[tuple(indexer)]
+    
+    # 3. Map string names to vectorized NumPy functions
     method_map = {
         "mean": np.mean,
         "median": np.median,
@@ -152,15 +162,7 @@ def resample(
     }
     reducer = method_map[method]
     
-    # Collect the reduced arrays slice-by-slice along the target axis
-    reduced_slices = []
-    for idx_array in ids_resampled:
-        # Pull out only the relevant window slices along our target axis
-        X_sub = np.take(X, idx_array, axis=axis)
-        # Reduce that window along the same axis
-        reduced_slices.append(reducer(X_sub, axis=axis))
-        
-    # Stack the reduced slices back together along the target axis
-    X_resampled = np.stack(reduced_slices, axis=axis)
+    # 4. Reduce along the newly created window dimension (always the last axis)
+    X_resampled = reducer(strided_windows, axis=-1)
 
     return X_resampled, ids_resampled
