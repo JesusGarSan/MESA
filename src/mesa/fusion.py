@@ -4,7 +4,7 @@ Contains functions to unfold feature tensors and combine
 extracted features from different signals.
 """
 import numpy as np
-from typing import Literal, List
+from typing import Literal, List, Tuple
 
 def unfold_2D(X: np.ndarray, rows: list, cols: list, labels:list = None, label_names:List[str] = None):
     """
@@ -92,3 +92,75 @@ def unfold_2D(X: np.ndarray, rows: list, cols: list, labels:list = None, label_n
                 label_names_unfold = [row_label_names, col_label_names]
 
     return X_permuted.reshape(row_size, col_size), labels_unfold, label_names_unfold
+
+
+def resample(
+    X: np.ndarray, 
+    axis: int, 
+    slice_len: int, 
+    slide: int = None, 
+    method: str = "mean"
+) -> Tuple[np.ndarray, List[np.ndarray]]:
+    """
+    Resamples a data tensor along a specified axis by grouping adjacent values.
+    """
+    # --- 1. Validation Logic ---
+    if not isinstance(X, np.ndarray):
+        raise TypeError("Input 'X' must be a numpy.ndarray.")
+    if X.size == 0:
+        raise ValueError("Input array 'X' cannot be empty.")
+        
+    if not (-X.ndim <= axis < X.ndim):
+        raise ValueError(f"Axis {axis} is out of bounds for an array with {X.ndim} dimensions.")
+    axis = axis % X.ndim  
+    
+    if not isinstance(slice_len, int) or slice_len <= 0:
+        raise ValueError("Argument 'slice_len' must be an integer greater than 0.")
+    if slice_len > X.shape[axis]:
+        raise ValueError(f"Window 'slice_len' ({slice_len}) cannot be larger than the axis size ({X.shape[axis]}).")
+        
+    if slide is None:
+        slide = slice_len
+    elif not isinstance(slide, int) or slide <= 0:
+        raise ValueError("Argument 'slide' must be an integer greater than 0.")
+        
+    valid_methods = {"mean", "median", "max", "min"}
+    method = method.lower()
+    if method not in valid_methods:
+        raise ValueError(f"Invalid method '{method}'. Choose from {valid_methods}.")
+
+    # --- 2. Window Mapping & Index Extraction ---
+    axis_len = X.shape[axis]
+    
+    # Generate the starting indices for each window
+    start_indices = range(0, axis_len - slice_len + 1, slide)
+    
+    # Map out the original IDs that make up each window
+    ids_resampled = [np.arange(start, start + slice_len) for start in start_indices]
+    
+    # If the slide/slice configuration doesn't fit any complete windows
+    if not ids_resampled:
+        raise ValueError("No complete windows can be formed with the given slice_len and slide.")
+
+    # --- 3. Reduction Processing ---
+    # Mapping string names to their respective math operations
+    method_map = {
+        "mean": np.mean,
+        "median": np.median,
+        "max": np.amax,
+        "min": np.amin
+    }
+    reducer = method_map[method]
+    
+    # Collect the reduced arrays slice-by-slice along the target axis
+    reduced_slices = []
+    for idx_array in ids_resampled:
+        # Pull out only the relevant window slices along our target axis
+        X_sub = np.take(X, idx_array, axis=axis)
+        # Reduce that window along the same axis
+        reduced_slices.append(reducer(X_sub, axis=axis))
+        
+    # Stack the reduced slices back together along the target axis
+    X_resampled = np.stack(reduced_slices, axis=axis)
+
+    return X_resampled, ids_resampled
